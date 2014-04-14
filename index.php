@@ -38,7 +38,7 @@ $cal = new Calendar($ym);
         </thead>
         <tbody>
             <?php
-                foreach ($cal->getweeks() as $week) {
+                foreach ($cal->getWeeks() as $week) {
                     echo $week;
                 }
             ?>

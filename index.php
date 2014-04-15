@@ -1,4 +1,5 @@
 <?php
+//ファイル読み込み
 require_once('calendar.php');
 
 //エスケープ処理
@@ -10,7 +11,6 @@ function h($s)
 $ym = isset($_GET['ym']) ? $_GET['ym'] : date('Y-m');
 
 $cal = new Calendar($ym);
-
 ?>
 <!DOCTYPE html>
 <html lang="UTF-8">

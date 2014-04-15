@@ -30,18 +30,21 @@ function optionLoop($start, $end, $value = null){
 </head>
 <body>
     <div id="header">
-        <select name="year">
-            <?php optionLoop($yearMin,$yearMax);?>
-        </select>
-        <p>年</p>
-        <select name="year">
-            <?php optionLoop($monthMin,$monthMax);?>
-        </select>
-        <p>月</p>
-        <select name="day">
-            <?php optionLoop($dayMin,$dayMax);?>
-        </select>
-        <p>日</p>
+        <form action="submit" method="$_GET" accept-charset="utf-8">
+            <select name="year">
+                <?php optionLoop($yearMin,$yearMax);?>
+            </select>
+            <p>年</p>
+            <select name="year">
+                <?php optionLoop($monthMin,$monthMax);?>
+            </select>
+            <p>月</p>
+            <select name="day">
+                <?php optionLoop($dayMin,$dayMax);?>
+            </select>
+            <p>日</p>
+            <button type="submit">表示</button>
+        </form>
     </div>
     <div class="main">
     </div>

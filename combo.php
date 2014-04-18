@@ -20,6 +20,16 @@ function optionLoop($start, $end, $value = null){
     }
 }
 ?>
+
+<?php
+$year = date('Y');
+$month = date('n');
+$day = 1;
+
+$last_date = mktime(0,0,0,$month,0,$year);
+echo $last_date;
+
+?>
 <!DOCTYPE html>
 <html>
 <head>

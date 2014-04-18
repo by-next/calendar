@@ -11,12 +11,12 @@ $last_date = mktime(0,0,0,$month,0,$year);
 //echo date("Y年m月d日",$last_date);
 $month_view = 3;
 
-for ($i = 0; $i<$month_view; $i++){
-    echo getCalendar($year, $month, $day, $events);
-}
+// for ($i = 0; $i<$month_view; $i++){
+//     echo getCalendar($year, $month, $day, $events);
+// }
 //ヘッダー部分の曜日表示
 $days    = array('日', '月', '火', '水', '木', '金', '土');
-$daysEng = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
+$daysEng = array('sun'=>'日', 'mon'=>'月', 'tue'=>'火', 'wed'=>'水', 'thu'=>'木', 'fri'=>'金', 'sat'=>'土');
 
 $nday = mktime();
 
@@ -38,7 +38,7 @@ $holidays['label'] = 'holiday';
 $events = array($holidays, $test);
 
 //カレンダーの出力
-//echo getCalendar($year, $month, $day, $events);
+echo getCalendar($year, $month, $day, $events);
 
 //先月カレンダー出力
 // $prev_cal = getCalendar($year, $month-1, $day, $events);
@@ -148,12 +148,13 @@ function getCalendar($year, $month, $day, $events) {
                     <thead>
                         <?php for ($i=0; $i<$month_view; $i++) : ?>
                             <th class="<?php echo getCalendar($year, $month, $day, $events) ?>"></th>
-                        <?php endfor ?>
+                        
                     </thead>
                     <tbody>
                         <tr>
                             <td>ごにょごにょ</td>
                         </tr>
+                        <?php endfor ?>
                     </tbody>
                 </table>
             </div>

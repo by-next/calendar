@@ -22,9 +22,9 @@ $cal = new Calendar($ym);
     <table>
         <thead>
             <tr>
-                <th><a href="?ym=<?php echo h($cal->prev()); ?>">&laquo;</a></th>
+                <th><a href="?ym=<?php echo h($cal->prev()); ?>">先月</a></th>
                 <th colspan="5"><?php echo h(date("Y",$timeStamp)."-".date("m",$timeStamp)); ?></th>
-                <th><a href="?ym=<?php echo h($cal->next()); ?>">&raquo;</a></th>
+                <th><a href="?ym=<?php echo h($cal->next()); ?>">次月</a></th>
             </tr>
             <tr>
                 <td>日</td>

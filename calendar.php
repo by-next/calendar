@@ -9,19 +9,23 @@ $last_date = mktime(0,0,0,$month,0,$year);
 
 //date関数に前月の最終日のタイムスタンプを指定
 //echo date("Y年m月d日",$last_date);
+$month_view = 3;
 
+for ($i = 0; $i<$month_view; $i++){
+    echo getCalendar($year, $month, $day, $events);
+}
 //ヘッダー部分の曜日表示
 $days    = array('日', '月', '火', '水', '木', '金', '土');
 $daysEng = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
 
 $nday = mktime();
 
-for($i = 0; $i < 31; $i++){
-    $w = (date('w') + $i) % 7;
-    if ($w != 0){
-        print date('d (' . $days[$w] . ')',mktime(0, 0, 0, date('m'), date('d')+$i, date('y'))) . "";
-    }
-}
+// for($i = 0; $i < 31; $i++){
+//     $w = (date('w') + $i) % 7;
+//     if ($w != 0){
+//         print date('d (' . $days[$w] . ')',mktime(0, 0, 0, date('m'), date('d')+$i, date('y'))) . "";
+//     }
+// }
 
 echo $firstWeek;
 echo $firstWeeks;
@@ -31,10 +35,19 @@ echo $firstWeeks;
 $holidays['label'] = 'holiday';
 
 //祝日情報を連想配列にいれるがまだ使わない
-$events = array($holidays, $tes);
+$events = array($holidays, $test);
 
 //カレンダーの出力
-echo getCalendar($year, $month, $day, $events);
+//echo getCalendar($year, $month, $day, $events);
+
+//先月カレンダー出力
+// $prev_cal = getCalendar($year, $month-1, $day, $events);
+// echo $prev_cal;
+
+// //
+// $next_cal = getCalendar($year, $month+1, $day, $events);
+// echo $next_cal;
+
 //指定月のカレンダーを生成
 function getCalendar($year, $month, $day, $events) {
     global $days, $daysEng;
@@ -131,16 +144,15 @@ function getCalendar($year, $month, $day, $events) {
         <content>
             <div>
                 <table>
-                    <caption>table title and/or explanatory text</caption>
+                    <caption>カレンダー</caption>
                     <thead>
-                        <tr>
-                        
-                            <th><?php echo $calendar; ?></th>
-                        </tr>
+                        <?php for ($i=0; $i<$month_view; $i++) : ?>
+                            <th class="<?php echo getCalendar($year, $month, $day, $events) ?>"></th>
+                        <?php endfor ?>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>data</td>
+                            <td>ごにょごにょ</td>
                         </tr>
                     </tbody>
                 </table>

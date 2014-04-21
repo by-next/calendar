@@ -3,33 +3,16 @@
 $year = date('Y');//年取得
 $month = date('m');//月取得
 
-$month_date = date('t',mktime(0,0,0,$month,1,$year));//月の日数表示
+$month_date = date('t',mktime(0,0,0,$month,1,$year));//月の日数表示(4月なら30日分)
 $month_begin_cell = date('w', mktime(0, 0, 0, $month, 1, $year));//当月の曜日の数値取得
 $last_day = date('w', mktime(0, 0, 0, $month, $month_date, $year));//月末の曜日の数値の取得
 $month_end_cell = 6-$last_day;//空マス計算
 
 $day = $month_date = date('t',mktime(0,0,0,$month,1,$year));
-$date = date('w', strtotime($year.$month.$day));
 
-var_dump($day);
+$week= date("w", mktime(0,0,0,$month,$day,$year));//月初の1日の曜日の数値
 
-//年月表示
-//echo $yearMonth.'<br />';
-
-// //月はじめの空セル生成
-//  for($n=1; $n<=$month_begin_cell; $n++){
-//      echo '空';
-//  }
-
-//月の日数表示
-
-// for($i=1; $i<=$month_date; $i++){
-//    echo $i;
-// }
-//月末の空セル計算表示
-// for($x=1; $x<$null; $x++){
-//     echo 'kara'.'<br />';
-// }
+    echo $week;
 
 ?>
 
@@ -57,17 +40,17 @@ var_dump($day);
         </thead>
         <tbody>
             <tr>
-            <?php for($n=1; $n<=$month_begin_cell; $n++):?>
-                <td><?php echo '空'; ?></td>
+            <?php for($i=1; $i<=$month_begin_cell; $i++):?>
+                <td><?php echo ''; ?></td>
             <?php endfor ?>
-
             <?php for($i=1; $i<=$month_date; $i++):?>
                 <td><?php echo $i; ?></td>
-                
-            <?php endfor ?>
-
-            <?php for($x=1; $x<=$month_end_cell; $x++):?>
-                <td><?php echo '空'; ?></td>
+            <?php if($week == 6):?>
+                </tr>
+            <?php endif ?>
+            <?php endfor?>
+            <?php for($i=1; $i<=$month_end_cell; $i++):?>
+                <td><?php echo ''; ?></td>
             <?php endfor;?>
             </tr>
         </tbody>

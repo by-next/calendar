@@ -1,47 +1,75 @@
 <?php
-//ファイル読み込み
-require_once('calendar.php');
 
-//エスケープ処理
-function h($s)
-{
-    return htmlspecialchars($s,ENT_QUOTES,'UTF-8');
-}
-//timestamp
-$ym = isset($_GET['ym']) ? $_GET['ym'] : date('Y-m');
+$year = date('Y');//年取得
+$month = date('m');//月取得
 
-$cal = new Calendar($ym);
+$month_date = date('t',mktime(0,0,0,$month,1,$year));//月の日数表示
+$month_begin_cell = date('w', mktime(0, 0, 0, $month, 1, $year));//当月の曜日の数値取得
+$last_day = date('w', mktime(0, 0, 0, $month, $month_date, $year));//月末の曜日の数値の取得
+$month_end_cell = 6-$last_day;//空マス計算
+
+$day = $month_date = date('t',mktime(0,0,0,$month,1,$year));
+$date = date('w', strtotime($year.$month.$day));
+
+var_dump($day);
+
+//年月表示
+//echo $yearMonth.'<br />';
+
+// //月はじめの空セル生成
+//  for($n=1; $n<=$month_begin_cell; $n++){
+//      echo '空';
+//  }
+
+//月の日数表示
+
+// for($i=1; $i<=$month_date; $i++){
+//    echo $i;
+// }
+//月末の空セル計算表示
+// for($x=1; $x<$null; $x++){
+//     echo 'kara'.'<br />';
+// }
+
 ?>
+
 <!DOCTYPE html>
-<html lang="UTF-8">
+<html>
 <head>
-    <link rel="stylesheet" href="css/style.css">
-    <title>calendar</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Calendar</title>
+    <link rel="stylesheet" href="">
 </head>
 <body>
-    <table>
+    <table border="1">
+        <caption><?php echo $year.$month;?></caption>
         <thead>
             <tr>
-                <th><a href="?ym=<?php echo h($cal->prev()); ?>">先月</a></th>
-                <th colspan="5"><?php echo h(date("Y",$timeStamp)."-".date("m",$timeStamp)); ?></th>
-                <th><a href="?ym=<?php echo h($cal->next()); ?>">次月</a></th>
-            </tr>
-            <tr>
-                <td>日</td>
-                <td>月</td>
-                <td>火</td>
-                <td>水</td>
-                <td>木</td>
-                <td>金</td>
-                <td>土</td>
+                <th class="sun">日</th>
+                <th>月</th>
+                <th>火</th>
+                <th>水</th>
+                <th>木</th>
+                <th>金</th>
+                <th class="sat">土</th>
             </tr>
         </thead>
         <tbody>
-            <?php
-                foreach ($cal->getWeeks() as $week) {
-                    echo $week;
-                }
-            ?>
+            <tr>
+            <?php for($n=1; $n<=$month_begin_cell; $n++):?>
+                <td><?php echo '空'; ?></td>
+            <?php endfor ?>
+
+            <?php for($i=1; $i<=$month_date; $i++):?>
+                <td><?php echo $i; ?></td>
+                
+            <?php endfor ?>
+
+            <?php for($x=1; $x<=$month_end_cell; $x++):?>
+                <td><?php echo '空'; ?></td>
+            <?php endfor;?>
+            </tr>
         </tbody>
     </table>
 </body>

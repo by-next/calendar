@@ -13,24 +13,6 @@ $date = date('w', strtotime($year.$month.$day));
 
 var_dump($day);
 
-//年月表示
-//echo $yearMonth.'<br />';
-
-// //月はじめの空セル生成
-//  for($n=1; $n<=$month_begin_cell; $n++){
-//      echo '空';
-//  }
-
-//月の日数表示
-
-// for($i=1; $i<=$month_date; $i++){
-//    echo $i;
-// }
-//月末の空セル計算表示
-// for($x=1; $x<$null; $x++){
-//     echo 'kara'.'<br />';
-// }
-
 ?>
 
 <!DOCTYPE html>

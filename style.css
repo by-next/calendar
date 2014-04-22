@@ -9,10 +9,16 @@ body {
 }
 /*曜日*/
 .sun{
-    color: rgba(255,0,0,0.5);
+    color: red;
+    background-color: rgba(255,0,0,0.1);
 }
 .sat{
-    color: rgba(0,0,255,0.5);
+    color: blue;
+    background-color: rgba(0,0,255,0.1);
+}
+.holiday{
+    color: red;
+    background-color: rgba(255,0,0,0.1);
 }
 /*ヘッダ*/
 #header{
@@ -27,7 +33,6 @@ body {
     margin-bottom: 20px;
     text-align: center;
 }
-
 /*メイン*/
 .box{
     background-color: #fff;
@@ -81,8 +86,6 @@ a{
 }
 /*テーブル*/
 table.cal {
-    max-width: 400px;
-    min-height: 320px;
     font-size: 18px;
     background-color: #fff;
     border-width: thin;
@@ -102,17 +105,22 @@ table.cal th {
     border-style: inset;
     border-color: gray;
     background-color: rgba(0,0,255,0.2);
-    width: 60px;
+    width: 100px;
+    height: 60px;
     -moz-border-radius: ;
 }
 table.cal td {
     text-align:center;
-    font-size: 12px;
+    font-size: 14px;
     border-width: 1px;
     padding: 5px;
     border-style: inset;
     border-color: gray;
-    background-color: rgba(0,0,200,0.05);
+    width: 100px;
     height: 50px;
     -moz-border-radius: ;
+}
+table.sun{
+    background-color: black;
+
 }

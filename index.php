@@ -1,22 +1,18 @@
 <?php
-define(GOOGLE_CAL_URL, 'japanese__ja@holiday.calendar.google.com');
-//日付のタームゾーンを変更
+// 日付のタームゾーンを変更
 ini_set("date.timezone", "Asia/Tokyo");
 
-//年月の指定があれば
-if (isset($_GET['year'])) {
-    $year = $_GET['year'];
-}
-if (isset($_GET['month'])) {
-    $month = sprintf('%02d',$_GET['month']);
-}//指定がなければ当月
-else{
+// googleAPI祝日取得
+define("CALENDAR_URL", "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com");
+
+if(isset($_GET['year']) && $_GET['year'] != '' && isset($_GET['month']) && $_GET['month'] != ''){
+    $year  = $_GET['year'];
+    $month = sprintf('%02d', $_GET['month']);
+// 指定がなければ本日の年月
+}else{
     $year  = date('Y');
     $month = date('m');
 }
-
-// $year  = date('Y');//年取得
-// $month = date('m');//月取得
 // $day   = date('d');//日取得
 
 $month_date       = date('t', mktime(0,0,0,$month,1,$year));//月の日数表示(4月なら30日分)
@@ -33,12 +29,12 @@ $half = floor($calendar_count/2);//真ん中にくる月計算
 $half_month = strtotime($year.$month.'01');//真ん中の月
 
 
-//カレンダー生成
+// カレンダー生成
 for($i=0; $i<$calendar_count; $i++){
 
     $count_num   = -$half + $i;//カレンダー表示数の半分の数値取得
     $count_month = sprintf('%02d',$month+$count_num);//中心からの差分
-    $format_time   = mktime(0, 0, 0, $count_month, 1, $year);
+    $format_time = mktime(0, 0, 0, $count_month, 1, $year);
 
     $calendars[]= array(
         'year' => $year_num = date('Y',$format_time),//年取得
@@ -49,7 +45,7 @@ for($i=0; $i<$calendar_count; $i++){
     );
 }
 
-//コンボボックスのループ設定
+// コンボボックスのループ設定
 function optionLoop($start, $end, $value = null){
  
     for($i = $start; $i <= $end; $i++){
@@ -61,49 +57,64 @@ function optionLoop($start, $end, $value = null){
     }
 }
 
-//先月
+// 先月
 $prev = array(
-    'year' => date('Y', strtotime('last month', $half_month)),
+    'year'  => date('Y', strtotime('last month', $half_month)),
     'month' => date('m', strtotime('last month', $half_month))
 );
-//次月
+// 次月
 $next = array(
-    'year' => date('Y', strtotime('next month', $half_month)),
+    'year'  => date('Y', strtotime('next month', $half_month)),
     'month' => date('m', strtotime('next month', $half_month))
 );
 
-//祝日取得
-function get_holidays_this_month($month){
-    $holidays_url = sprintf(
-            'http://www.google.com/calendar/feeds/%s/public/full-noattendees?start-min=%s&amp;start-max=%s&amp;max-results=%d&amp;alt=json' ,
-            'outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com' ,
-            $year.$month.'-01' ,  // 取得開始日
-            $year.$month.'-31' ,  // 取得終了日
-            50            // 最大取得数
+// 祝日取得開始
+// クラス生成
+class CalenderUtil{
+    public static function getGoogleCalender($min_date, $max_date){
+//祝日の配列
+        $holidays = array();
+// google apiのurl
+        $url = 'http://www.google.com/calendar/feeds/%s/public/full-noattendees?%s';
+// パラメータ
+        $params = array(
+            'start-min'   => $min_date,
+            'start-max'   => $max_date,
+            'max-results' => 100,
+            'alt'         => 'json',
             );
-    if ( $results = file_get_contents($holidays_url) ) {
-            $results = json_decode($results, true);
+        $queryString = http_build_query($params);
+// URLを取得
+        $getUrl = sprintf($url, CALENDAR_URL, $queryString);
+// データ取得
+        if($results = file_get_contents($getUrl)){ 
+// デコードしたデータ
+            $resultsDecode = json_decode($results, true);
+// 休日を設定するリスト
             $holidays = array();
-            foreach ($results['feed']['entry'] as $val ) {
-                    $date  = $val['gd$when'][0]['startTime'];
-                    $week = date('w',strtotime($date));
-                    $title = $val['title']['$t'];
-                    $holidays[$date] = $title;
-                    if( $week == 0) {
-                        $nextday = date('Y-m-d',strtotime('+1 day', strtotime($date)));
-                        $holidays[$nextday] = '振替休日';
-                    }
-                    $before_yesterday = date('Y-m-d',strtotime('-2 day', strtotime($date)));
-                    if(isset($holidays[$before_yesterday])){
-                        $yesterday = date('Y-m-d',strtotime('-1 day', strtotime($date)));
-                        $holidays[$yesterday] = '国民の休日';
-                    }
+// リスト分出力
+            foreach ($resultsDecode['feed']['entry'] as $key => $val){
+// 日付
+                $date = $val['gd$when'][0]['startTime'];
+// タイトル
+                $title = $val['title']['$t'];
+                $title = explode(' / ', $title);
+// 日付をキーに設定
+                $holidays[$date] = $title[0];
             }
-            ksort($holidays);
+        }
+        return $holidays;
     }
-    return $holidays;
 }
-var_dump($holidays);
+
+// 現在の年より年初～年末までを取得
+$nowYear = date('Y');
+$holiday_first = date('Y-m-d', strtotime("{$nowYear}0101"));
+$holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
+ 
+// 祝日出力
+$holidays = CalenderUtil::getGoogleCalender($holiday_first, $holiday_end);
+
 ?>
 
 <!DOCTYPE html>
@@ -153,13 +164,34 @@ var_dump($holidays);
                             <?php endfor ?>
 
                             <?php $week=$calendar['month_begin_cell'];
-                            for($d=1; $d<=$calendar['month_date']; $d++):?>
-                                <td><?php echo $d; ?></td>
+                            for($d = 1; $d <= $calendar['month_date']; $d++):
+                                $date_str = $calendar['year'].'-'.$calendar['month'].'-'.sprintf('%02d',$d);
+                                $class = '';
+                                switch ($week) {
+                                    case 6:
+                                        $class .= 'sat ';
+                                        break;
+                                    case 0:
+                                        $class .= 'sun ';
+                                        break;
+                                }
+                                if( $is_holiday = isset($holidays[$date_str])){
+                                    $class .= 'holiday';
+                                }
+                                ?>
+                                <td class="<?php echo $class ?>">
+                                    <?php echo $d; ?>
+                                    <br />
+                                    <?php if($is_holiday):?>
+                                        <?php echo $holidays[$date_str]; ?>
+                                    <?php endif ?>
+                                </td>
                             <?php $week++ ?>
-                                <?php if($week == 7): ?>
+                                <?php if($week == 7): ?><!--土曜-->
                                     </tr><tr>
-                                <?php $week=0; ?>
+                                <?php $week=0; ?><!--日曜-->
                                 <?php endif ?>
+                            <?php $holiday_names = '';?><!--祝日-->
                             <?php endfor?>
                             
                             <?php for($i=1; $i<=$calendar['month_end_cell']; $i++):?>

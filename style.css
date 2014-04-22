@@ -1,0 +1,58 @@
+@charset "UTF-8";
+
+/*css*/
+
+.sun{
+    color: red;
+}
+.sat{
+    color: blue;
+}
+#header{
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    color : green;
+}
+.header_link{
+    width: 100%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.box{
+    width: 400px;
+    background-color: black;
+}
+a{
+    text-decoration: none;
+}
+table.cal {
+    border-width: thin;
+    border-spacing: 0px;
+    border-style: outset;
+    border-color: gray;
+    border-collapse: collapse;
+    background-color: rgb(255, 245, 238);
+    text-align: center;
+    float: left;
+    margin-left: 25px;
+}
+table.cal th {
+    border-width: 1px;
+    padding: 5px;
+    border-style: inset;
+    border-color: gray;
+    background-color: white;
+    width: 60px;
+    -moz-border-radius: ;
+}
+table.cal td {
+    border-width: 1px;
+    padding: 5px;
+    border-style: inset;
+    border-color: gray;
+    background-color: white;
+    height: 50px;
+    -moz-border-radius: ;
+}

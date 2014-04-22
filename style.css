@@ -1,18 +1,25 @@
 @charset "UTF-8";
 
 /*css*/
-
+body {
+    font-family:'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック','MS PGothic',sans-serif;
+    font-size: 12px;
+    line-height: 1.6;
+    letter-spacing: 0;
+}
+/*曜日*/
 .sun{
-    color: red;
+    color: rgba(255,0,0,0.5);
 }
 .sat{
-    color: blue;
+    color: rgba(0,0,255,0.5);
 }
+/*ヘッダ*/
 #header{
     width: 100%;
     margin: 0 auto;
     text-align: center;
-    color : green;
+    color : rgba(100,200,0,1);
 }
 .header_link{
     width: 100%;
@@ -20,39 +27,92 @@
     margin-bottom: 20px;
     text-align: center;
 }
+
+/*メイン*/
 .box{
-    width: 400px;
-    background-color: black;
+    background-color: #fff;
 }
 a{
+    margin: 5px;
+    font-size: 20px;
     text-decoration: none;
 }
+/*アンカ*/
+.button{
+    font:15px Arial, sans-serif;
+    text-shadow:1px 1px 0 rgba(255,255,255,0.4);
+    text-decoration:none !important;
+    white-space:nowrap;
+    display:inline-block;
+    vertical-align:baseline;
+    position:relative;
+    cursor:pointer;
+    padding:10px 20px;
+    background-repeat:no-repeat;
+    background-position:bottom left;
+    background-image:url('button_bg.png');
+    background-position:bottom left, top right, 0 0, 0 0;
+    background-clip:border-box;
+        -moz-border-radius:8px;
+        -webkit-border-radius:8px;
+    border-radius:8px;
+        -moz-box-shadow:0 0 1px #fff inset;
+        -webkit-box-shadow:0 0 1px #fff inset;
+    box-shadow:0 0 1px #fff inset;
+        -webkit-transition:background-position 1s;
+        -moz-transition:background-position 1s;
+        transition:background-position 1s;
+}
+.button:hover{
+    background-position:top left;
+    background-position:top left, bottom right, 0 0, 0 0;
+}
+
+.button:active{
+    bottom:-1px;
+}
+.button.big     { font-size:30px;}
+.button.medium  { font-size:18px;}
+.button.small   { font-size:13px;}
+.button.rounded{
+    -moz-border-radius:4em;
+    -webkit-border-radius:4em;
+    border-radius:4em;
+}
+/*テーブル*/
 table.cal {
+    max-width: 400px;
+    min-height: 320px;
+    font-size: 18px;
+    background-color: #fff;
     border-width: thin;
     border-spacing: 0px;
     border-style: outset;
     border-color: gray;
     border-collapse: collapse;
-    background-color: rgb(255, 245, 238);
     text-align: center;
     float: left;
     margin-left: 25px;
 }
 table.cal th {
+    font-size: 16px;
+    font-weight: lighter;
     border-width: 1px;
     padding: 5px;
     border-style: inset;
     border-color: gray;
-    background-color: white;
+    background-color: rgba(0,0,255,0.2);
     width: 60px;
     -moz-border-radius: ;
 }
 table.cal td {
+    text-align:center;
+    font-size: 12px;
     border-width: 1px;
     padding: 5px;
     border-style: inset;
     border-color: gray;
-    background-color: white;
+    background-color: rgba(0,0,200,0.05);
     height: 50px;
     -moz-border-radius: ;
 }

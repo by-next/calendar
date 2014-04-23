@@ -116,7 +116,24 @@ $holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
 $holidays = CalenderUtil::getGoogleCalender($holiday_first, $holiday_end);
 
 ?>
+<?php
 
+$data = array();
+
+$rss = simplexml_load_file('http://aucfan.com/article/feed/');
+foreach ($rss->channel->item as $item) {
+    $x = array();
+
+    $x['date']  = (string)$item->pubDate;
+    $date = date('Y-m-d', strtotime($date));
+    $x['link']  = (string)$item->link;
+    $x['title'] = (string)$item->title;
+    $data[] = $x;
+}
+var_dump($data);
+
+
+?>
 <!DOCTYPE html>
 <html>
 <head>

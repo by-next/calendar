@@ -15,7 +15,7 @@ if(isset($_GET['year']) && $_GET['year'] != '' && isset($_GET['month']) && $_GET
 }
 // $day   = date('d');//日取得
 
-$month_date       = date('t', mktime(0,0,0,$month,1,$year));//月の日数表示(4月なら30日分)
+$month_date       = date('t', mktime(0, 0, 0, $month, 1, $year));//月の日数表示(4月なら30日分)
 $month_begin_cell = date('w', mktime(0, 0, 0, $month, 1, $year));//当月の曜日の数値取得
 $last_day         = date('w', mktime(0, 0, 0, $month, $month_date, $year));//月末の曜日の数値の取得
 $month_end_cell   = 6-$last_day;//空マス計算
@@ -70,42 +70,39 @@ $next = array(
 );
 
 // 祝日取得開始
-// クラス生成
-class CalenderUtil{
-    public static function getGoogleCalender($min_date, $max_date){
+function getGoogleCalender($min_date, $max_date){
 //祝日の配列
-        $holidays = array();
+    $holidays = array();
 // google apiのurl
-        $url = 'http://www.google.com/calendar/feeds/%s/public/full-noattendees?%s';
+    $url = 'http://www.google.com/calendar/feeds/%s/public/full-noattendees?%s';
 // パラメータ
-        $params = array(
-            'start-min'   => $min_date,
-            'start-max'   => $max_date,
-            'max-results' => 100,
-            'alt'         => 'json',
-            );
-        $queryString = http_build_query($params);
+    $params = array(
+        'start-min'   => $min_date,
+        'start-max'   => $max_date,
+        'max-results' => 100,
+        'alt'         => 'json',
+        );
+    $queryString = http_build_query($params);
 // URLを取得
-        $getUrl = sprintf($url, CALENDAR_URL, $queryString);
+    $getUrl = sprintf($url, CALENDAR_URL, $queryString);
 // データ取得
-        if($results = file_get_contents($getUrl)){
+    if($results = file_get_contents($getUrl)){
 // デコードしたデータ
-            $resultsDecode = json_decode($results, true);
+        $resultsDecode = json_decode($results, true);
 // 休日を設定するリスト
-            $holidays = array();
+        $holidays = array();
 // リスト分出力
-            foreach ($resultsDecode['feed']['entry'] as $key => $val){
+        foreach ($resultsDecode['feed']['entry'] as $key => $val){
 // 日付
-                $date = $val['gd$when'][0]['startTime'];
+            $date = $val['gd$when'][0]['startTime'];
 // タイトル
-                $title = $val['title']['$t'];
-                $title = explode(' / ', $title);
+            $title = $val['title']['$t'];
+            $title = explode(' / ', $title);
 // 日付をキーに設定
-                $holidays[$date] = $title[0];
-            }
+            $holidays[$date] = $title[0];
         }
-        return $holidays;
     }
+    return $holidays;
 }
 
 // 現在の年より年初～年末までを取得
@@ -114,10 +111,8 @@ $holiday_first = date('Y-m-d', strtotime("{$nowYear}0101"));
 $holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
  
 // 祝日出力
-$holidays = CalenderUtil::getGoogleCalender($holiday_first, $holiday_end);
+$holidays = getGoogleCalender($holiday_first, $holiday_end);
 
-?>
-<?php
 // オクトピ取得
 $rss  = simplexml_load_file('http://aucfan.com/article/feed/');//フィード取得URL
 
@@ -133,7 +128,7 @@ foreach ($rss->channel->item as $key => $value) {
     $auc_topic[$date] = $title;
     $auc_link[$date]  = $link;
 }
-var_dump($auc_topic);
+var_dump($auc_link);
 
 
 ?>
@@ -208,9 +203,10 @@ var_dump($auc_topic);
                                     <?php if($is_holiday):?><!--祝日-->
                                         <?php echo $holidays[$date_str]; ?>
                                     <?php endif ?>
-                                    <a href=""><?php if($is_topic):?><!--オクトピ-->
+                                    <?php if($is_topic):?><!--オクトピ-->
+                                        <a class="topic tooltip" href="<?php echo $auc_link[$date_str];?>" title="<?php echo $auc_topic[$date_str];?>"target="_blank">
                                         <?php echo $auc_topic[$date_str]; ?>
-                                    </a>
+                                        </a>
                                     <?php endif ?>
                                 </td>
                             <?php $week++ ?>

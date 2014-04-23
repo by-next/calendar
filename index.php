@@ -122,15 +122,14 @@ $data = array();
 
 $rss = simplexml_load_file('http://aucfan.com/article/feed/');
 foreach ($rss->channel->item as $item) {
-    $x = array();
-
-    $x['date']  = (string)$item->pubDate;
-    $date = date('Y-m-d', strtotime($date));
-    $x['link']  = (string)$item->link;
-    $x['title'] = (string)$item->title;
-    $data[] = $x;
+    $feed = array();//受け取った内容を配列に挿入
+    $feed['date']  = (string)$item->pubDate;
+    $feed['date']  = date('Y-m-d', strtotime($date));
+    $feed['title'] = (string)$item->title;
+    $feed['link']  = (string)$item->link;
+    $data[] = $feed;
 }
-var_dump($data);
+var_dump($data);//取ってきた内容を日付、タイトル、リンクを挿入
 
 
 ?>

@@ -38,10 +38,15 @@ body {
     background-color: #fff;
 }
 a{
-    margin: 5px;
-    font-size: 20px;
+    margin: 0 auto;
+    font-size: 10px;
     text-decoration: none;
+    line-height: bottom;
 }
+.topic{
+    font-size: 1px;
+}
+
 /*アンカ*/
 .button{
     font:15px Arial, sans-serif;
@@ -110,8 +115,9 @@ table.cal th {
     -moz-border-radius: ;
 }
 table.cal td {
-    text-align:center;
-    font-size: 14px;
+    text-align:left;
+    vertical-align: top;
+    font-size: 10px;
     border-width: 1px;
     padding: 5px;
     border-style: inset;
@@ -120,7 +126,8 @@ table.cal td {
     height: 50px;
     -moz-border-radius: ;
 }
-table.sun{
+table.topic td {
     background-color: black;
+    font-size: 4px;
 
 }

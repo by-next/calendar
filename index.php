@@ -140,7 +140,7 @@ foreach ( $rss->channel->item as $key => $value) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Calendar</title>
     <link rel="stylesheet" href="">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="caa/style.css">
 </head>
 <body>
     <header id="header" class="">

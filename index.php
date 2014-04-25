@@ -13,36 +13,38 @@ if(isset($_GET['year']) && $_GET['year'] != '' && isset($_GET['month']) && $_GET
     $year  = date('Y');
     $month = date('m');
 }
-// $day   = date('d');//日取得
 
-$month_date       = date('t', mktime(0, 0, 0, $month, 1, $year));//月の日数表示(4月なら30日分)
-$month_begin_cell = date('w', mktime(0, 0, 0, $month, 1, $year));//当月の曜日の数値取得
-$last_day         = date('w', mktime(0, 0, 0, $month, $month_date, $year));//月末の曜日の数値の取得
-$month_end_cell   = 6-$last_day;//空マス計算
+$today   = date('d');// 本日取得
+var_dump($today);
 
-//カレンダー表示配列
+$month_date       = date('t', mktime(0, 0, 0, $month, 1, $year));// 月の日数表示(4月なら30日分)
+$month_begin_cell = date('w', mktime(0, 0, 0, $month, 1, $year));// 当月の曜日の数値取得
+$last_day         = date('w', mktime(0, 0, 0, $month, $month_date, $year));// 月末の曜日の数値の取得
+$month_end_cell   = 6-$last_day;// 空マス計算
+
+// カレンダー表示配列
 $calendars = array();
-//カレンダー表示数
-$calendar_count = 3;
-//真ん中にくる月計算
+// カレンダー表示数
+$calendar_count = 5;
+// 真ん中にくる月計算
 $half = floor($calendar_count/2);
-//真ん中の月
+// 真ん中の月
 $half_month = strtotime($year.$month.'01');
 
 // カレンダー生成
 for($i=0; $i<$calendar_count; $i++){
-//カレンダー表示数の半分の数値取得
+// カレンダー表示数の半分の数値取得
     $count_num   = -$half + $i;
-//中心からの差分
+// 中心からの差分
     $count_month = sprintf('%02d',$month+$count_num);
     $format_time = mktime(0, 0, 0, $count_month, 1, $year);
-//カレンダー計算
+// カレンダー計算
     $calendars[]= array(
-        'year'             => $year_num = date('Y',$format_time),//年取得
-        'month'            => $count_month = date('m',$format_time),//月取得
-        'month_begin_cell' => date('w',mktime(0,0,0,$count_month,1,$year_num)),//月の日数表示(4月なら30日分)
-        'month_date'       => $month_date = date('t',mktime(0,0,0,$count_month,1,$year_num)),//当月の曜日の数値取得
-        'month_end_cell'   => 6-date('w', mktime(0, 0, 0, $count_month, $month_date, $year_num))//空マス計算
+        'year'             => $year_num = date('Y',$format_time),// 年取得
+        'month'            => $count_month = date('m',$format_time),// 月取得
+        'month_begin_cell' => date('w',mktime(0,0,0,$count_month,1,$year_num)),// 月の日数表示(4月なら30日分)
+        'month_date'       => $month_date = date('t',mktime(0,0,0,$count_month,1,$year_num)),// 当月の曜日の数値取得
+        'month_end_cell'   => 6-date('w', mktime(0, 0, 0, $count_month, $month_date, $year_num))// 空マス計算
     );
 }
 
@@ -71,7 +73,7 @@ $next = array(
 
 // 祝日取得開始
 function getGoogleCalender($min_date, $max_date){
-//祝日の配列
+// 祝日の配列
     $holidays = array();
 // google apiのurl
     $url = 'http://www.google.com/calendar/feeds/%s/public/full-noattendees?%s';
@@ -79,7 +81,7 @@ function getGoogleCalender($min_date, $max_date){
     $params = array(
         'start-min'   => $min_date,
         'start-max'   => $max_date,
-        'max-results' => 100,
+        'max-results' => 30,
         'alt'         => 'json',
         );
     $queryString = http_build_query($params);
@@ -114,24 +116,23 @@ $holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
 $holidays = getGoogleCalender($holiday_first, $holiday_end);
 
 // オクトピ取得
-$rss  = simplexml_load_file('http://aucfan.com/article/feed/');//フィード取得URL
+$rss  = simplexml_load_file('http://aucfan.com/article/feed/');// フィード取得URL
 
-$date  = array();//日付の値挿入
-$title = array();//オクトピタイトル挿入
-$link  = array();//リンクURL挿入
-$auc_topic = array();//オクトピの配列
+$date  = array();// 日付の値挿入
+$title = array();// オクトピタイトル挿入
+$link  = array();// リンクURL挿入
+$auc_topic = array();// オクトピの配列
 
-foreach ($rss->channel->item as $key => $value) {
+foreach ( $rss->channel->item as $key => $value) {
     $title = (string)$value->title;
-    $date  = date('Y-m-d', strtotime((string)$value->pubDate));//日付を整形して代入
+    $date  = date('Y-m-d', strtotime((string)$value->pubDate));// 日付を整形して代入
     $link  = (string)$value->link;
     $auc_topic[$date] = $title;
     $auc_link[$date]  = $link;
 }
-var_dump($auc_link);
-
 
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -203,9 +204,12 @@ var_dump($auc_link);
                                     <?php if($is_holiday):?><!--祝日-->
                                         <?php echo $holidays[$date_str]; ?>
                                     <?php endif ?>
+                                    <?php if($d === $today) :?><!-- 今日 -->
+                                        <?php $class='today'; ?>
+                                    <?php endif ?>
                                     <?php if($is_topic):?><!--オクトピ-->
-                                        <a class="topic tooltip" href="<?php echo $auc_link[$date_str];?>" title="<?php echo $auc_topic[$date_str];?>"target="_blank">
-                                        <?php echo $auc_topic[$date_str]; ?>
+                                        <a class="topic" href="<?php echo $auc_link[$date_str];?>" title="<?php echo $auc_topic[$date_str];?>" target="_blank" >
+                                        <?php echo mb_strimwidth($auc_topic[$date_str], 0, 15,'…'); ?>
                                         </a>
                                     <?php endif ?>
                                 </td>
@@ -214,13 +218,11 @@ var_dump($auc_link);
                                     </tr><tr>
                                 <?php $week=0; ?><!--日曜-->
                                 <?php endif ?>
-                            <?php $holiday_names = '';?>
-                            <?php $topic_names = '';?>
-                            
+                            <?php $holiday_names = ''; ?>
+                            <?php $topic_names = ''; ?>
                             <?php endfor?>
-                            
                             <?php for($i=1; $i<=$calendar['month_end_cell']; $i++):?>
-                                <td><?php echo ''?></td>
+                                <td><?php echo '' ?></td>
                             <?php endfor;?>
                         </tr>
                     </tbody>

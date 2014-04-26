@@ -1,58 +1,60 @@
 <?php
-
 $year = date('Y');//年取得
-$month = date('m');//月取得
-
-$month_date = date('t',mktime(0,0,0,$month,1,$year));//月の日数表示
-$month_begin_cell = date('w', mktime(0, 0, 0, $month, 1, $year));//当月の曜日の数値取得
-$last_day = date('w', mktime(0, 0, 0, $month, $month_date, $year));//月末の曜日の数値の取得
-$month_end_cell = 6-$last_day;//空マス計算
-
-$day = $month_date = date('t',mktime(0,0,0,$month,1,$year));
-$date = date('w', strtotime($year.$month.$day));
-
-var_dump($day);
-
+$month = 6; //date('m');//月取得
+$day =  date('t',mktime(0,0,0,$month,1,$year));
+$week = (int)($day / 7) + 1;
+$week_array = array(
+	"sun" => "日",
+	"mon" => "月",
+	"thu" => "火",
+	"wed" => "水",
+	"thi" => "木",
+	"fir" => "金",
+	"sat" => "土"
+);
 ?>
 
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Calendar</title>
-    <link rel="stylesheet" href="">
-</head>
-<body>
-    <table border="1">
-        <caption><?php echo $year.$month;?></caption>
-        <thead>
-            <tr>
-                <th class="sun">日</th>
-                <th>月</th>
-                <th>火</th>
-                <th>水</th>
-                <th>木</th>
-                <th>金</th>
-                <th class="sat">土</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-            <?php for($n=1; $n<=$month_begin_cell; $n++):?>
-                <td><?php echo '空'; ?></td>
-            <?php endfor ?>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Calendar</title>
+		<link rel="stylesheet" href="">
+	</head>
 
-            <?php for($i=1; $i<=$month_date; $i++):?>
-                <td><?php echo $i; ?></td>
-                
-            <?php endfor ?>
+	<body>
+		<table border="1">
+			<caption><?php echo $year.$month;?></caption>
+			<thead>
+				<tr>
+					<?php foreach($week_array as $key => $value): ?>
+					<th class="<?= $key ?>"><?= $value ?></th>
+					<?php endforeach ?>
+				</tr>
+			</thead>
+			<tbody>
+				<?php $current_day = 1;  ?>
+				<?php $index_day = $current_day; ?>
 
-            <?php for($x=1; $x<=$month_end_cell; $x++):?>
-                <td><?php echo '空'; ?></td>
-            <?php endfor;?>
-            </tr>
-        </tbody>
-    </table>
-</body>
+				<?php for($i=0; $i<$week; $i++): ?>
+				<?php $current_week_num = 0;  ?>
+				<tr>
+					<?php for($n=$current_day; $n<$index_day+7; $n++):?>
+					<?php if( $current_week_num == date('w', mktime(0, 0, 0, $month, $current_day, $year)) && $current_day <= $day): ?>
+					<td class="date<?= $month.sprintf("%02d", $current_day) ?>"><?= $current_day ?></td>
+					<?php $current_day++;  ?>
+					<?php else: ?>
+					<td>NaN</td>
+					<?php endif; ?>
+					<?php $current_week_num++;  ?>
+					<?php endfor;?>
+					<?php $index_day = $current_day; ?>
+				</tr>
+				<?php endfor; ?>
+			</tbody>
+		</table>
+	</body>
 </html>
+
+

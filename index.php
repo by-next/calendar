@@ -50,7 +50,7 @@ for($i=0; $i<$calendar_count; $i++){
 
 // コンボボックスのループ設定
 function optionLoop($start, $end, $value = null){
- 
+
     for($i = $start; $i <= $end; $i++){
         if(isset($value) &&  $value == $i){
             echo '<option value="'.$i.'" selected="selected">'.$i.'</option>';
@@ -111,7 +111,7 @@ function getGoogleCalender($min_date, $max_date){
 $nowYear = date('Y');
 $holiday_first = date('Y-m-d', strtotime("{$nowYear}0101"));
 $holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
- 
+
 // 祝日出力
 $holidays = getGoogleCalender($holiday_first, $holiday_end);
 
@@ -234,11 +234,13 @@ END;
 
 if ($result = mysqli_query($db, $schedule_sql)) {
     while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-var_dump($row);
         list($_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($row['start_time'])));
         list($end__year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($row['end_time'])));
-        $schedules[$_year][$s_month][$s_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-        $schedules[$_year][$s_month][$s_day][$row['schedule_id']]['contents'] = $row['schedule_contents'];
+        $schedules[$_year][$s_month][$s_day][] = array(
+            'title' => $row['schedule_title'],
+            'contents' => $row['schedule_contents'],
+            'schedule_id' => $row['schedule_id']
+        );
         if ($row['start_time'] != $row['end_time']) {
             for ($i=$s_day; $i<=$end_s_day; $i++) {
                 $schedules[$_year][$s_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
@@ -251,7 +253,7 @@ mysqli_close($db);
 
 ?>
 //
-<?php 
+<?php
 // $tmp = $schedules[$_year][$s_month][$s_day];
 // if(is_array($tmp)) {
 // echo $tmp[min(array_keys($tmp))]['title'];
@@ -286,7 +288,7 @@ mysqli_close($db);
             </form>
         </div>
         <div class="box">
-            <?php foreach ($calendars as $calendar) :?>    
+            <?php foreach ($calendars as $calendar) :?>
                 <table class="cal">
                     <caption><?php echo $calendar['year'].'年'.$calendar['month'].'月';?></caption>
                     <thead>
@@ -329,24 +331,28 @@ mysqli_close($db);
                                 }
                                 ?>
                                 <td class="<?php echo $class ?>">
-                                    <a href="http://kensyu.aucfan.com/schedule.php?ymd=<?php echo $date_str; ?>"><?php echo $day;?></a>
-                                    <?php $tmp = $schedules[$calendar['year']][$calendar['month']][$day];?>
-                                    <?php if(!empty($tmp)):?>
+                                    <a href="schedule.php?ymd=<?php echo $date_str; ?>"><?php echo $day;?></a>
+                                    <!-- 予定 -->
+                                    <?php
+                                    $tmp = $schedules[$calendar['year']][$calendar['month']][$day];
+                                    if(!empty($tmp)) foreach ($tmp as $schedule) : ?>
+                                        <a href="schedule.php?ymd=<?php echo $date_str; ?>&id=<?php echo $schedule['schedule_id'] ?>">
+                                        <?php echo $schedule['title']; ?>
+                                        </a>
+                                    <?php endforeach ?>
 
-                                    <a href="http://kensyu.aucfan.com/schedule.php?ymd=<?php echo $date_str; ?>&id=">
-                                    <?php if(is_array($tmp))
-                                        echo $tmp[min(array_keys($tmp))]['title'];
-                                    ?>
-<?php var_dump($tmp);?>
-                                    <?php endif ?>
-                                    <?php if($holidays):?><!--祝日-->
+                                    <!--祝日-->
+                                    <?php if($holidays):?>
                                         <?php echo $holidays[$date_str]; ?><br />
                                     <?php endif ?>
-                                    <?php if($auc_topic):?><!--オクトピ-->
+
+                                    <!--オクトピ-->
+                                    <?php if($auc_topic):?>
                                         <a class="topic" href="<?php echo $auc_link[$date_str];?>" title="<?php echo $auc_topic[$date_str];?>" target="_blank" >
                                         <?php echo mb_strimwidth($auc_topic[$date_str], 0, 15,'…'); ?>
                                         </a>
                                     <?php endif ?>
+
                                 </td>
                             <?php $week++ ?>
                                 <?php if($week == 7): ?><!--土曜-->

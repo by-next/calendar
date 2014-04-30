@@ -50,7 +50,7 @@ for($i=0; $i<$calendar_count; $i++){
 
 // コンボボックスのループ設定
 function optionLoop($start, $end, $value = null){
- 
+
     for($i = $start; $i <= $end; $i++){
         if(isset($value) &&  $value == $i){
             echo '<option value="'.$i.'" selected="selected">'.$i.'</option>';
@@ -111,7 +111,7 @@ function getGoogleCalender($min_date, $max_date){
 $nowYear = date('Y');
 $holiday_first = date('Y-m-d', strtotime("{$nowYear}0101"));
 $holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
- 
+
 // 祝日出力
 $holidays = getGoogleCalender($holiday_first, $holiday_end);
 
@@ -130,8 +130,6 @@ foreach ( $rss->channel->item as $key => $value) {
     $auc_topic[$date] = $title;
     $auc_link[$date]  = $link;
 }
-
-//スケジュール登録変更削除
 //DB接続
 $host = 'localhost';
 $user = 'root';
@@ -139,87 +137,15 @@ $password = '';
 $database = 'cal';
 
 // MySQL に接続し、データベースを選択
-$db = mysqli_connect($host, $user, $password, $database);
+$connect = mysqli_connect($host, $user, $password, $database);
 
 // 接続状況をチェック
 if (mysqli_connect_errno()) {
     die(mysqli_connect_error());
 }
 
-/*
-*フォームからPOSTされたデータ
-*/
-$post_data = $_POST;
-//開始時間と終了時間
-$start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
-$end_time   = $post_data['end_hour'].':'.$post_data['end_min'].':00';
-//開始日と終了日
-$start_time = $post_data['start_year'].'-'.$post_data['start_month'].'-'.$post_data['start_day'].' '.$start_time;
-$end_time   = $post_data['end_year'].'-'.$post_data['end_month'].'-'.$post_data['end_day'].' '.$end_time;
-//予定のタイトルと詳細
-$schedule_title    = $post_data['schedule_title'];
-$schedule_contents = $post_data['schedule_contents'];
-$id = $post_data['schedule_id'];
-$between_begin = $calendars[1].'-01 00:00:01';
-$between_end = $calendars[3].'-'.$end_times[3].' 23:59:59';
-print_r($post_data);
-
-var_dump($start_time);
-
-
-if (empty($id) && ($schedule_title != null)) {
-
-$sql=<<<EOF
-    INSERT INTO
-        cal_schedule
-    SET
-        start_time        = "$start_time",
-        end_time          = "$end_time",
-        schedule_title    = "$schedule_title",
-        schedule_contents = "$schedule_contents",
-        update_at         = NOW(),
-        created_at        = NOW(),
-        deleted_at        = null
-EOF;
-
-}
-elseif(isset($id) && !isset($post_data['delete'])) {
-
-$sql=<<<EOF
-    UPDATE
-        cal_schedule
-    SET
-        start_time        = "$start_time",
-        end_time          = "$end_time",
-        schedule_title    = "$schedule_title",
-        schedule_contents = "$schedule_contents",
-        update_at         = NOW()
-    WHERE
-        schedule_id       = "$id"
-EOF;
-
-}
-elseif ($post_data['delete'] == 'delete') {
-
-$sql=<<<EOF
-    UPDATE
-        cal_schedule
-    SET
-        deleted_at  = NOW()
-    WHERE
-        schedule_id = "$id"
-EOF;
-
-}
-
-print_r($sql);
-
-//SQL実行
-if (isset($start_time) && !empty($sql)) {
-    $sql_result = mysqli_query($db, $sql);
-}
-//削除非表示
-$schedule_sql =<<<END
+//削除は非表示
+$schedule_sql =<<<EOD
 
     SELECT
          schedule_id, start_time, end_time, schedule_title, schedule_contents
@@ -230,15 +156,17 @@ $schedule_sql =<<<END
     IS
          null
 
-END;
+EOD;
 
-if ($result = mysqli_query($db, $schedule_sql)) {
+if ($result = mysqli_query($connect, $schedule_sql)) {
     while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-var_dump($row);
         list($_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($row['start_time'])));
         list($end__year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($row['end_time'])));
-        $schedules[$_year][$s_month][$s_day][$row['schedule_id']]['title'] = $row['schedule_title'];
-        $schedules[$_year][$s_month][$s_day][$row['schedule_id']]['contents'] = $row['schedule_contents'];
+        $schedules[$_year][$s_month][$s_day][] = array(
+            'title' => $row['schedule_title'],
+            'contents' => $row['schedule_contents'],
+            'schedule_id' => $row['schedule_id']
+        );
         if ($row['start_time'] != $row['end_time']) {
             for ($i=$s_day; $i<=$end_s_day; $i++) {
                 $schedules[$_year][$s_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
@@ -247,16 +175,7 @@ var_dump($row);
     }
     mysqli_free_result($result);
 }
-mysqli_close($db);
-
-?>
-//
-<?php 
-// $tmp = $schedules[$_year][$s_month][$s_day];
-// if(is_array($tmp)) {
-// echo $tmp[min(array_keys($tmp))]['title'];
-// }
-
+mysqli_close($connect);
 
 ?>
 
@@ -286,7 +205,7 @@ mysqli_close($db);
             </form>
         </div>
         <div class="box">
-            <?php foreach ($calendars as $calendar) :?>    
+            <?php foreach ($calendars as $calendar) :?>
                 <table class="cal">
                     <caption><?php echo $calendar['year'].'年'.$calendar['month'].'月';?></caption>
                     <thead>
@@ -329,24 +248,28 @@ mysqli_close($db);
                                 }
                                 ?>
                                 <td class="<?php echo $class ?>">
-                                    <a href="http://kensyu.aucfan.com/schedule.php?ymd=<?php echo $date_str; ?>"><?php echo $day;?></a>
-                                    <?php $tmp = $schedules[$calendar['year']][$calendar['month']][$day];?>
-                                    <?php if(!empty($tmp)):?>
-
-                                    <a href="http://kensyu.aucfan.com/schedule.php?ymd=<?php echo $date_str; ?>&id=">
-                                    <?php if(is_array($tmp))
-                                        echo $tmp[min(array_keys($tmp))]['title'];
-                                    ?>
-<?php var_dump($tmp);?>
-                                    <?php endif ?>
-                                    <?php if($holidays):?><!--祝日-->
+                                    <a href="schedule.php?ymd=<?php echo $date_str; ?>"><?php echo $day;?></a>
+                                    <!--祝日-->
+                                    <?php if($holidays):?>
                                         <?php echo $holidays[$date_str]; ?><br />
                                     <?php endif ?>
-                                    <?php if($auc_topic):?><!--オクトピ-->
+
+                                    <!-- 予定 -->
+                                    <?php
+                                    $tmp = $schedules[$calendar['year']][$calendar['month']][$day];
+                                    if(!empty($tmp)) foreach ($tmp as $schedule) : ?>
+                                        <a href="schedule.php?ymd=<?php echo $date_str; ?>&id=<?php echo $schedule['schedule_id'] ?>">
+                                        <?php echo mb_strimwidth($schedule['title'], 0, 10,'…'); ?><br />
+                                        </a>
+                                    <?php endforeach ?>
+
+                                    <!--オクトピ-->
+                                    <?php if($auc_topic):?>
                                         <a class="topic" href="<?php echo $auc_link[$date_str];?>" title="<?php echo $auc_topic[$date_str];?>" target="_blank" >
                                         <?php echo mb_strimwidth($auc_topic[$date_str], 0, 15,'…'); ?>
                                         </a>
                                     <?php endif ?>
+
                                 </td>
                             <?php $week++ ?>
                                 <?php if($week == 7): ?><!--土曜-->

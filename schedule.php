@@ -6,7 +6,6 @@ if ($timestamp === false) {
 }
 $sdate = $year_month_day;
 list($year, $month, $day) = explode('-', $sdate);// 日にちを文字列の分解
-var_dump($year);
 
 $update ='';
 $schedule_id = $_GET['id'];
@@ -27,7 +26,7 @@ if (mysqli_connect_errno()) {
 }
 
 //削除分非表示SQL
-$schedule_sql =<<<END
+$schedule_sql =<<<EOD
     SELECT
          schedule_id, start_time, end_time, schedule_title, schedule_contents
     FROM
@@ -38,21 +37,19 @@ $schedule_sql =<<<END
          deleted_at
     IS
          null
-END;
+EOD;
 
 // SQL実行
 if ($result = mysqli_query($connect, $schedule_sql)) {
     while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
         list($s_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($row['start_time'])));
         list($end_s_year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($row['end_time'])));
-        $data = array($row['schedule_title'],$row['schedule_contents']);
-        $schedules[$s_year][$s_month][$s_day][$row['schedule_id']]['title'] = $data;
-        $schedules[$end_s_year][$end_s_month][$end_s_day][$row['schedule_id']]['title'] = $data;
+        $schedules[$s_year][$s_month][$s_day][$row['schedule_id']]['title'] = $row['schedule_title'];
+        $schedules[$s_year][$s_month][$s_day][$row['schedule_id']]['contents'] = $row['schedule_contents'];
     }
     mysqli_free_result($result);
 }
 mysqli_close($connect);
-
 if (!isset($schedule_id)) {
     $end_year  = $year;
     $end_month = $month;
@@ -78,15 +75,15 @@ if (!isset($schedule_id)) {
 <body>
     <h1>スケジュール登録</h1>
     <div>
-        <form method="post" action="http://kensyu.aucfan.com/">
-        開始日
-        <input type="text" name="start_year"  value="<?php echo $year;?>" />年
-        <input type="text" name="start_month" value="<?php echo $month;?>" />月
-        <input type="text" name="start_day"   value="<?php echo $day;?>" />日<br />
-        終了日
-        <input type="text" name="end_year"  value="<?php echo $end_year;?>" />年
-        <input type="text" name="end_month" value="<?php echo $end_month;?>" />月
-        <input type="text" name="end_day"   value="<?php echo $end_day;?>" />日<br />
+        <form method="post" action="http://kensyu.aucfan.com/redirect_sql.php">
+        開始日　
+        <input class="input_ymd" type="text" name="start_year"  value="<?php echo $year;?>" />年
+        <input class="input_ymd" type="text" name="start_month" value="<?php echo $month;?>" />月
+        <input class="input_ymd" type="text" name="start_day"   value="<?php echo $day;?>" />日<br />
+        終了日　
+        <input class="input_ymd" type="text" name="end_year"  value="<?php echo $end_year;?>" />年
+        <input class="input_ymd" type="text" name="end_month" value="<?php echo $end_month;?>" />月
+        <input class="input_ymd" type="text" name="end_day"   value="<?php echo $end_day;?>" />日<br />
         タイトル
         <input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedules[$s_year][$s_month][$s_day][$schedule_id]['title'];?>" /><br />
         詳細
@@ -102,10 +99,10 @@ if (!isset($schedule_id)) {
         </form>
     </div>
     <div>
-        <form method="post" action="http://kensyu.aucfan.com/">
-            <input type="hidden" id="delete" name="delete" value="delete" />
+        <form class="delete" method="post" action="http://kensyu.aucfan.com/redirect_sql.php">
+            <input type="hidden" name="delete" value="delete" />
             <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
-            <input type="submit" value="削除" />
+            <input id="submit_delete" type="submit" value="削除" />
         </form>
     </div>
 </body>

@@ -6,7 +6,6 @@ if ($timestamp === false) {
 }
 $sdate = $year_month_day;
 list($year, $month, $day) = explode('-', $sdate);// 日にちを文字列の分解
-var_dump($year);
 
 $update ='';
 $schedule_id = $_GET['id'];
@@ -45,14 +44,12 @@ if ($result = mysqli_query($connect, $schedule_sql)) {
     while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
         list($s_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($row['start_time'])));
         list($end_s_year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($row['end_time'])));
-        $data = array($row['schedule_title'],$row['schedule_contents']);
-        $schedules[$s_year][$s_month][$s_day][$row['schedule_id']]['title'] = $data;
-        $schedules[$end_s_year][$end_s_month][$end_s_day][$row['schedule_id']]['title'] = $data;
+        $schedules[$s_year][$s_month][$s_day][$row['schedule_id']]['title'] = $row['schedule_title'];
+        $schedules[$s_year][$s_month][$s_day][$row['schedule_id']]['contents'] = $row['schedule_contents'];
     }
     mysqli_free_result($result);
 }
 mysqli_close($connect);
-
 if (!isset($schedule_id)) {
     $end_year  = $year;
     $end_month = $month;

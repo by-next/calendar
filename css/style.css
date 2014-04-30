@@ -7,6 +7,11 @@ body {
     line-height: 1.6;
     letter-spacing: 0;
 }
+a{
+    font-size: 13px;
+    text-decoration: none;
+    padding:5px;
+}
 a.topic{
     font-size: 12px;
     text-decoration: none;
@@ -50,7 +55,7 @@ a.tooltip:hover span{
     background-color: rgba(255,0,0,0.1);
 }
 .today{
-    background-color: red;
+    background-color: rgba(0,255,0,0.2);
 }
 /*ヘッダ*/
 #header{
@@ -78,7 +83,8 @@ a.tooltip:hover span{
 }
 /*テーブル*/
 table.cal {
-    margin-bottom: 5px;
+    max-width: 800px;
+    max-height: 600px;
     font-size: 18px;
     background-color: #fff;
     border-width: thin;
@@ -101,7 +107,7 @@ table.cal th {
     background-color: rgba(0,0,255,0.2);
     width: 100px;
     height: 60px;
-    -moz-border-radius: ;
+     -moz-border-radius: ;
 }
 table.cal td {
     text-align:left;
@@ -113,5 +119,31 @@ table.cal td {
     border-color: gray;
     width: 100px;
     height: 80px;
-    -moz-border-radius: ;
+     -moz-border-radius: ;
+}
+.schedule_form{
+
+
+}
+input.submit_button{
+    font-size: 1.2em;
+    margin: 30px;
+    width: 100px;
+    height: 60px;
+    padding: 20px 50px;
+}
+.delete{
+    width: 300px;
+    height: 100px;
+    float: left;
+}
+input#submit_delete{
+    font-size: 1.2em;
+    margin: 30px;
+    width: 100px;
+    height: 60px;
+    padding: 20px 50px;
+}
+input.input_ymd{
+    width: 30px;
 }

@@ -159,18 +159,19 @@ $schedule_sql =<<<EOD
 EOD;
 
 if ($result = mysqli_query($connect, $schedule_sql)) {
-    while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-        list($_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($row['start_time'])));
-        list($end__year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($row['end_time'])));
+    while ($array_row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+        list($_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($array_row['start_time'])));
+        list($end__year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($array_row['end_time'])));
         $schedules[$_year][$s_month][$s_day][] = array(
-            'title' => $row['schedule_title'],
-            'contents' => $row['schedule_contents'],
-            'schedule_id' => $row['schedule_id']
+            'title' => $array_row['schedule_title'],
+            'contents' => $array_row['schedule_contents'],
+            'schedule_id' => $array_row['schedule_id']
         );
-        if ($row['start_time'] != $row['end_time']) {
-            for ($i=$s_day; $i<=$end_s_day; $i++) {
-                $schedules[$_year][$s_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+        if ($array_row['start_time'] != $array_row['end_time']) {
+            for ($day=$s_day; $day<=$end_s_day; $day++) {
+                $schedules[$_year][$s_month][$day][$array_row['schedule_id']]['title'] = $array_row['schedule_title'];
             }
+
         }
     }
     mysqli_free_result($result);
@@ -248,22 +249,24 @@ mysqli_close($connect);
                                 }
                                 ?>
                                 <td class="<?php echo $class ?>">
+                                    <!-- 日付出力 -->
                                     <a href="schedule.php?ymd=<?php echo $date_str; ?>"><?php echo $day;?></a>
-                                    <!--祝日-->
+
+                                    <!-- 祝日 -->
                                     <?php if($holidays):?>
                                         <?php echo $holidays[$date_str]; ?><br />
                                     <?php endif ?>
 
                                     <!-- 予定 -->
-                                    <?php
-                                    $tmp = $schedules[$calendar['year']][$calendar['month']][$day];
+                                    <?php $tmp = $schedules[$calendar['year']][$calendar['month']][$day];
                                     if(!empty($tmp)) foreach ($tmp as $schedule) : ?>
+
                                         <a href="schedule.php?ymd=<?php echo $date_str; ?>&id=<?php echo $schedule['schedule_id'] ?>">
                                         <?php echo mb_strimwidth($schedule['title'], 0, 10,'…'); ?><br />
                                         </a>
                                     <?php endforeach ?>
 
-                                    <!--オクトピ-->
+                                    <!-- オクトピ -->
                                     <?php if($auc_topic):?>
                                         <a class="topic" href="<?php echo $auc_link[$date_str];?>" title="<?php echo $auc_topic[$date_str];?>" target="_blank" >
                                         <?php echo mb_strimwidth($auc_topic[$date_str], 0, 15,'…'); ?>
@@ -272,9 +275,13 @@ mysqli_close($connect);
 
                                 </td>
                             <?php $week++ ?>
-                                <?php if($week == 7): ?><!--土曜-->
+
+                                <!-- 土曜日 -->
+                                <?php if($week == 7): ?>
                                     </tr><tr>
-                                <?php $week=0; ?><!--日曜-->
+
+                                <!-- 日曜日 -->
+                                <?php $week=0; ?>
                                 <?php endif ?>
                             <?php endfor?>
                             <?php for($i=1; $i<=$calendar['month_end_cell']; $i++):?>

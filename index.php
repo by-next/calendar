@@ -14,8 +14,8 @@ if(isset($_GET['year']) && $_GET['year'] != '' && isset($_GET['month']) && $_GET
     $month = date('m');
 }
 
-$today   = date('d');// 本日取得
-var_dump($today);
+$today   = date('Y-m-d');// 本日取得
+// var_dump($today);
 
 $month_date       = date('t', mktime(0, 0, 0, $month, 1, $year));// 月の日数表示(4月なら30日分)
 $month_begin_cell = date('w', mktime(0, 0, 0, $month, 1, $year));// 当月の曜日の数値取得
@@ -25,7 +25,7 @@ $month_end_cell   = 6-$last_day;// 空マス計算
 // カレンダー表示配列
 $calendars = array();
 // カレンダー表示数
-$calendar_count = 5;
+$calendar_count = 3;
 // 真ん中にくる月計算
 $half = floor($calendar_count/2);
 // 真ん中の月
@@ -131,6 +131,133 @@ foreach ( $rss->channel->item as $key => $value) {
     $auc_link[$date]  = $link;
 }
 
+//スケジュール登録変更削除
+//DB接続
+$host = 'localhost';
+$user = 'root';
+$password = '';
+$database = 'cal';
+
+// MySQL に接続し、データベースを選択
+$db = mysqli_connect($host, $user, $password, $database);
+
+// 接続状況をチェック
+if (mysqli_connect_errno()) {
+    die(mysqli_connect_error());
+}
+
+/*
+*フォームからPOSTされたデータ
+*/
+$post_data = $_POST;
+//開始時間と終了時間
+$start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
+$end_time   = $post_data['end_hour'].':'.$post_data['end_min'].':00';
+//開始日と終了日
+$start_time = $post_data['start_year'].'-'.$post_data['start_month'].'-'.$post_data['start_day'].' '.$start_time;
+$end_time   = $post_data['end_year'].'-'.$post_data['end_month'].'-'.$post_data['end_day'].' '.$end_time;
+//予定のタイトルと詳細
+$schedule_title    = $post_data['schedule_title'];
+$schedule_contents = $post_data['schedule_contents'];
+$id = $post_data['schedule_id'];
+$between_begin = $calendars[1].'-01 00:00:01';
+$between_end = $calendars[3].'-'.$end_times[3].' 23:59:59';
+print_r($post_data);
+
+var_dump($start_time);
+
+
+if (empty($id) && ($schedule_title != null)) {
+
+$sql=<<<EOF
+    INSERT INTO
+        cal_schedule
+    SET
+        start_time        = "$start_time",
+        end_time          = "$end_time",
+        schedule_title    = "$schedule_title",
+        schedule_contents = "$schedule_contents",
+        update_at         = NOW(),
+        created_at        = NOW(),
+        deleted_at        = null
+EOF;
+
+}
+elseif(isset($id) && !isset($post_data['delete'])) {
+
+$sql=<<<EOF
+    UPDATE
+        cal_schedule
+    SET
+        start_time        = "$start_time",
+        end_time          = "$end_time",
+        schedule_title    = "$schedule_title",
+        schedule_contents = "$schedule_contents",
+        update_at         = NOW()
+    WHERE
+        schedule_id       = "$id"
+EOF;
+
+}
+elseif ($post_data['delete'] == 'delete') {
+
+$sql=<<<EOF
+    UPDATE
+        cal_schedule
+    SET
+        deleted_at  = NOW()
+    WHERE
+        schedule_id = "$id"
+EOF;
+
+}
+
+print_r($sql);
+
+//SQL実行
+if (isset($start_time) && !empty($sql)) {
+    $sql_result = mysqli_query($db, $sql);
+}
+//削除非表示
+$schedule_sql =<<<END
+
+    SELECT
+         schedule_id, start_time, end_time, schedule_title, schedule_contents
+    FROM
+         cal_schedule
+    WHERE
+         deleted_at
+    IS
+         null
+
+END;
+
+if ($result = mysqli_query($db, $schedule_sql)) {
+    while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+var_dump($row);
+        list($_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($row['start_time'])));
+        list($end__year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($row['end_time'])));
+        $schedules[$_year][$s_month][$s_day][$row['schedule_id']]['title'] = $row['schedule_title'];
+        $schedules[$_year][$s_month][$s_day][$row['schedule_id']]['contents'] = $row['schedule_contents'];
+        if ($row['start_time'] != $row['end_time']) {
+            for ($i=$s_day; $i<=$end_s_day; $i++) {
+                $schedules[$_year][$s_month][$i][$row['schedule_id']]['title'] = $row['schedule_title'];
+            }
+        }
+    }
+    mysqli_free_result($result);
+}
+mysqli_close($db);
+
+?>
+//
+<?php 
+// $tmp = $schedules[$_year][$s_month][$s_day];
+// if(is_array($tmp)) {
+// echo $tmp[min(array_keys($tmp))]['title'];
+// }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -140,7 +267,7 @@ foreach ( $rss->channel->item as $key => $value) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Calendar</title>
     <link rel="stylesheet" href="">
-    <link rel="stylesheet" href="caa/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header id="header" class="">
@@ -180,8 +307,8 @@ foreach ( $rss->channel->item as $key => $value) {
                             <?php endfor ?>
 
                             <?php $week=$calendar['month_begin_cell'];
-                            for($d = 1; $d <= $calendar['month_date']; $d++):
-                                $date_str = $calendar['year'].'-'.$calendar['month'].'-'.sprintf('%02d',$d);
+                            for($day = 1; $day <= $calendar['month_date']; $day++):
+                                $date_str = $calendar['year'].'-'.$calendar['month'].'-'.sprintf('%02d',$day);
                                 $class = '';
                                 switch ($week) {
                                     case 6:
@@ -191,23 +318,31 @@ foreach ( $rss->channel->item as $key => $value) {
                                         $class .= 'sun ';
                                         break;
                                 }
-                                if( $is_holiday = isset($holidays[$date_str])){
-                                    $class .= 'holiday';
+                                if(isset($holidays[$date_str])){
+                                    $class .= 'holiday ';
                                 }
-                                if( $is_topic = isset($auc_topic[$date_str])){
-                                    $class .= 'topic';
+                                if(isset($auc_topic[$date_str])){
+                                    $class .= 'topic ';
+                                }
+                                if($date_str == $today){
+                                    $class .= 'today';
                                 }
                                 ?>
                                 <td class="<?php echo $class ?>">
-                                    <?php echo $d; ?>
-                                    <br />
-                                    <?php if($is_holiday):?><!--祝日-->
-                                        <?php echo $holidays[$date_str]; ?>
+                                    <a href="http://kensyu.aucfan.com/schedule.php?ymd=<?php echo $date_str; ?>"><?php echo $day;?></a>
+                                    <?php $tmp = $schedules[$calendar['year']][$calendar['month']][$day];?>
+                                    <?php if(!empty($tmp)):?>
+
+                                    <a href="http://kensyu.aucfan.com/schedule.php?ymd=<?php echo $date_str; ?>&id=">
+                                    <?php if(is_array($tmp))
+                                        echo $tmp[min(array_keys($tmp))]['title'];
+                                    ?>
+<?php var_dump($tmp);?>
                                     <?php endif ?>
-                                    <?php if($d === $today) :?><!-- 今日 -->
-                                        <?php $class='today'; ?>
+                                    <?php if($holidays):?><!--祝日-->
+                                        <?php echo $holidays[$date_str]; ?><br />
                                     <?php endif ?>
-                                    <?php if($is_topic):?><!--オクトピ-->
+                                    <?php if($auc_topic):?><!--オクトピ-->
                                         <a class="topic" href="<?php echo $auc_link[$date_str];?>" title="<?php echo $auc_topic[$date_str];?>" target="_blank" >
                                         <?php echo mb_strimwidth($auc_topic[$date_str], 0, 15,'…'); ?>
                                         </a>
@@ -218,8 +353,6 @@ foreach ( $rss->channel->item as $key => $value) {
                                     </tr><tr>
                                 <?php $week=0; ?><!--日曜-->
                                 <?php endif ?>
-                            <?php $holiday_names = ''; ?>
-                            <?php $topic_names = ''; ?>
                             <?php endfor?>
                             <?php for($i=1; $i<=$calendar['month_end_cell']; $i++):?>
                                 <td><?php echo '' ?></td>

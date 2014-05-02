@@ -48,18 +48,6 @@ for($i=0; $i<$calendar_count; $i++){
     );
 }
 
-// コンボボックスのループ設定
-function optionLoop($start, $end, $value = null){
-
-    for($i = $start; $i <= $end; $i++){
-        if(isset($value) &&  $value == $i){
-            echo '<option value="'.$i.'" selected="selected">'.$i.'</option>';
-        }else{
-            echo '<option value="'.$i.'">'.$i.'</option>';
-        }
-    }
-}
-
 // 先月
 $prev = array(
     'year'  => date('Y', strtotime('last month', $half_month)),
@@ -71,7 +59,8 @@ $next = array(
     'month' => date('m', strtotime('next month', $half_month))
 );
 
-// 祝日取得開始
+
+// +祝日取得開始
 function getGoogleCalender($min_date, $max_date){
 // 祝日の配列
     $holidays = array();
@@ -115,8 +104,11 @@ $holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
 // 祝日出力
 $holidays = getGoogleCalender($holiday_first, $holiday_end);
 
-// オクトピ取得
+
+// +オクトピ取得
 $rss  = simplexml_load_file('http://aucfan.com/article/feed/');// フィード取得URL
+
+var_dump($rss);
 
 $date  = array();// 日付の値挿入
 $title = array();// オクトピタイトル挿入
@@ -144,6 +136,8 @@ if (mysqli_connect_errno()) {
     die(mysqli_connect_error());
 }
 
+
+
 //削除は非表示
 $schedule_sql =<<<EOD
 
@@ -155,28 +149,54 @@ $schedule_sql =<<<EOD
          deleted_at
     IS
          null
-
 EOD;
 
 if ($result = mysqli_query($connect, $schedule_sql)) {
     while ($array_row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-        list($_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($array_row['start_time'])));
-        list($end__year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($array_row['end_time'])));
-        $schedules[$_year][$s_month][$s_day][] = array(
-            'title' => $array_row['schedule_title'],
-            'contents' => $array_row['schedule_contents'],
+        list($s_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($array_row['start_time'])));
+        list($end_s_year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($array_row['end_time'])));
+        $schedules[$s_year][$s_month][$s_day][] = array(
+            'title'       => $array_row['schedule_title'],
+            'contents'    => $array_row['schedule_contents'],
             'schedule_id' => $array_row['schedule_id']
         );
-        if ($array_row['start_time'] != $array_row['end_time']) {
-            for ($day=$s_day; $day<=$end_s_day; $day++) {
-                $schedules[$_year][$s_month][$day][$array_row['schedule_id']]['title'] = $array_row['schedule_title'];
-            }
 
+        if (strtotime($array_row['start_time']) >= strtotime($array_row['end_time'])) {
+            var_dump($array_row['start_time'], $array_row['end_time']);
+            continue;
+        }
+
+//一致した日に＋1日して予定吐き出し
+        $n_day   = $s_day;
+        $n_month = $s_month;
+        $n_year  = $s_year;
+
+        // for($i=1;strtotime($array_row['start_time'].'+'.$i.' day')<=strtotime($array_row['end_time']);$i++)
+
+        while ($n_day != $end_s_day || $n_month != $end_s_month || $n_year != $end_s_year) {
+            $ymd_day = date('Y-m-j',strtotime('tomorrow',strtotime($n_year.'-'.$n_month.'-'.$n_day)));
+            list($n_year, $n_month, $n_day) = explode('-', $ymd_day);
+            $schedules[$n_year][$n_month][$n_day][] = array(
+                'title'       => $array_row['schedule_title'],
+                'contents'    => $array_row['schedule_contents'],
+                'schedule_id' => $array_row['schedule_id']
+            );
         }
     }
     mysqli_free_result($result);
 }
 mysqli_close($connect);
+
+
+
+for ($i=$s_combo_year; $i < $e_combo_year; $i++) { 
+    echo $i.'<br />';
+}
+
+var_dump($st_year);
+// コンボボックス
+$s_combo_year = $year-5;
+$e_combo_year = $year+5;
 
 ?>
 
@@ -200,8 +220,15 @@ mysqli_close($connect);
             <a href="<?php echo '?year='.$next['year'].'&month='.$next['month'] ?>" class="button medium">次月</a>
             <form method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
                 <select name="year">
-                    <?php optionLoop('1995', '2030',date('Y'));?></select>年
-                    <select name="month"><?php optionLoop('1', '12', '6');?></select>月
+                    <?php for ($i=$s_combo_year; $i <= $e_combo_year; $i++) : ?>
+                        <option value="<?php echo $i ?>"<?php if($i == $year) echo 'selected' ?>><?php echo $i ?></option>
+                    <?php endfor ?>
+                </select>年
+                <select name="month">
+                    <?php for ($i=1; $i <= 12; $i++) : ?>
+                        <option value="<?php echo $i ?>"<?php if($i == $month) echo 'selected' ?>><?php echo $i ?></option>
+                    <?php endfor ?>
+                </select>月
                 <input type="submit" value="表示">
             </form>
         </div>
@@ -257,21 +284,22 @@ mysqli_close($connect);
                                         <?php echo $holidays[$date_str]; ?><br />
                                     <?php endif ?>
 
+                                    <!-- オクトピ -->
+                                    <?php if(!empty($auc_topic[$date_str])):?>
+                                        <a class="topic" href="<?php echo $auc_link[$date_str];?>" target="_blank" >
+                                            <?php echo mb_strimwidth($auc_topic[$date_str], 0, 13,'…'); ?>
+                                            <span><strong>トピック内容</strong><br /><?php echo mb_strimwidth($auc_topic[$date_str], 0, 50,'…'); ?></span>
+                                        </a>
+                                    <?php endif ?>
+
                                     <!-- 予定 -->
                                     <?php $tmp = $schedules[$calendar['year']][$calendar['month']][$day];
                                     if(!empty($tmp)) foreach ($tmp as $schedule) : ?>
-
-                                        <a href="schedule.php?ymd=<?php echo $date_str; ?>&id=<?php echo $schedule['schedule_id'] ?>">
-                                        <?php echo mb_strimwidth($schedule['title'], 0, 10,'…'); ?><br />
+                                        <a class="tooltip" href="schedule.php?ymd=<?php echo $date_str; ?>&id=<?php echo $schedule['schedule_id'] ?>">
+                                            <?php echo mb_strimwidth($schedule['title'], 0, 10,'…'); ?><br />
+                                            <span><strong>スケジュール内容</strong><br /><?php echo mb_strimwidth($schedule['contents'], 0, 30,'…'); ?></span>
                                         </a>
                                     <?php endforeach ?>
-
-                                    <!-- オクトピ -->
-                                    <?php if($auc_topic):?>
-                                        <a class="topic" href="<?php echo $auc_link[$date_str];?>" title="<?php echo $auc_topic[$date_str];?>" target="_blank" >
-                                        <?php echo mb_strimwidth($auc_topic[$date_str], 0, 15,'…'); ?>
-                                        </a>
-                                    <?php endif ?>
 
                                 </td>
                             <?php $week++ ?>

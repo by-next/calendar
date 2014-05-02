@@ -1,10 +1,14 @@
 <?php
-header("location: http://kensyu.aucfan.com/");
 
-//スケジュール登録変更削除
-//DB接続
-$host = 'localhost';
-$user = 'root';
+$year = $_GET['year'];
+$month = $_GET['month'];
+
+
+header("location: http://kensyu.aucfan.com/?year=".$year."&month=".$month);
+
+// DB接続
+$host     = 'localhost';
+$user     = 'root';
 $password = '';
 $database = 'cal';
 
@@ -16,15 +20,17 @@ if (mysqli_connect_errno()) {
     die(mysqli_connect_error());
 }
 
-//フォームからpostされたデータを格納
-
+//フォームからのpostデータを格納
 $post_data = $_POST;
+
 //開始時間と終了時間
 $start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
 $end_time   = $post_data['end_hour'].':'.$post_data['end_min'].':00';
+
 //開始日と終了日
 $start_time = $post_data['start_year'].'-'.$post_data['start_month'].'-'.$post_data['start_day'].' '.$start_time;
 $end_time   = $post_data['end_year'].'-'.$post_data['end_month'].'-'.$post_data['end_day'].' '.$end_time;
+
 //予定のタイトルと詳細
 $schedule_title    = $post_data['schedule_title'];
 $schedule_contents = $post_data['schedule_contents'];
@@ -73,6 +79,7 @@ $sql=<<<EOD
     UPDATE
         cal_schedule
     SET
+        update_at   = NOW(),
         deleted_at  = NOW()
     WHERE
         schedule_id = "$id"

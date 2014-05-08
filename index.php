@@ -61,48 +61,48 @@ $next = array(
 
 
 // +祝日取得開始
-function getGoogleCalender($min_date, $max_date){
-// 祝日の配列
-    $holidays = array();
-// google apiのurl
-    $url = 'http://www.google.com/calendar/feeds/%s/public/full-noattendees?%s';
-// パラメータ
-    $params = array(
-        'start-min'   => $min_date,
-        'start-max'   => $max_date,
-        'max-results' => 30,
-        'alt'         => 'json',
-        );
-    $queryString = http_build_query($params);
-// URLを取得
-    $getUrl = sprintf($url, CALENDAR_URL, $queryString);
-// データ取得
-    if($results = file_get_contents($getUrl)){
-// デコードしたデータ
-        $resultsDecode = json_decode($results, true);
-// 休日を設定するリスト
-        $holidays = array();
-// リスト分出力
-        foreach ($resultsDecode['feed']['entry'] as $key => $val){
-// 日付
-            $date = $val['gd$when'][0]['startTime'];
-// タイトル
-            $title = $val['title']['$t'];
-            $title = explode(' / ', $title);
-// 日付をキーに設定
-            $holidays[$date] = $title[0];
-        }
-    }
-    return $holidays;
-}
+// function getGoogleCalender($min_date, $max_date){
+// // 祝日の配列
+//     $holidays = array();
+// // google apiのurl
+//     $url = 'http://www.google.com/calendar/feeds/%s/public/full-noattendees?%s';
+// // パラメータ
+//     $params = array(
+//         'start-min'   => $min_date,
+//         'start-max'   => $max_date,
+//         'max-results' => 30,
+//         'alt'         => 'json',
+//         );
+//     $queryString = http_build_query($params);
+// // URLを取得
+//     $getUrl = sprintf($url, CALENDAR_URL, $queryString);
+// // データ取得
+//     if($results = file_get_contents($getUrl)){
+// // デコードしたデータ
+//         $resultsDecode = json_decode($results, true);
+// // 休日を設定するリスト
+//         $holidays = array();
+// // リスト分出力
+//         foreach ($resultsDecode['feed']['entry'] as $key => $val){
+// // 日付
+//             $date = $val['gd$when'][0]['startTime'];
+// // タイトル
+//             $title = $val['title']['$t'];
+//             $title = explode(' / ', $title);
+// // 日付をキーに設定
+//             $holidays[$date] = $title[0];
+//         }
+//     }
+//     return $holidays;
+// }
 
-// 現在の年より年初～年末までを取得
-$nowYear = date('Y');
-$holiday_first = date('Y-m-d', strtotime("{$nowYear}0101"));
-$holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
+// // 現在の年より年初～年末までを取得
+// $nowYear = date('Y');
+// $holiday_first = date('Y-m-d', strtotime("{$nowYear}0101"));
+// $holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
 
-// 祝日出力
-$holidays = getGoogleCalender($holiday_first, $holiday_end);
+// // 祝日出力
+// $holidays = getGoogleCalender($holiday_first, $holiday_end);
 
 
 // +オクトピ取得
@@ -122,6 +122,7 @@ foreach ( $rss->channel->item as $key => $value) {
     $auc_topic[$date] = $title;
     $auc_link[$date]  = $link;
 }
+
 //DB接続
 $host = 'localhost';
 $user = 'root';
@@ -188,11 +189,6 @@ if ($result = mysqli_query($connect, $schedule_sql)) {
 mysqli_close($connect);
 
 
-
-for ($i=$s_combo_year; $i < $e_combo_year; $i++) { 
-    echo $i.'<br />';
-}
-
 var_dump($st_year);
 // コンボボックス
 $s_combo_year = $year-5;
@@ -206,7 +202,6 @@ $e_combo_year = $year+5;
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Calendar</title>
-    <link rel="stylesheet" href="">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -219,17 +214,17 @@ $e_combo_year = $year+5;
             <a href="index.php" class="button medium">今月</a>
             <a href="<?php echo '?year='.$next['year'].'&month='.$next['month'] ?>" class="button medium">次月</a>
             <form method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
-                <select name="year">
+                <select class="submit_btn" name="year">
                     <?php for ($i=$s_combo_year; $i <= $e_combo_year; $i++) : ?>
                         <option value="<?php echo $i ?>"<?php if($i == $year) echo 'selected' ?>><?php echo $i ?></option>
                     <?php endfor ?>
                 </select>年
-                <select name="month">
+                <select class="submit_btn" name="month">
                     <?php for ($i=1; $i <= 12; $i++) : ?>
                         <option value="<?php echo $i ?>"<?php if($i == $month) echo 'selected' ?>><?php echo $i ?></option>
                     <?php endfor ?>
                 </select>月
-                <input type="submit" value="表示">
+                <input class="submit_btn" type="submit" value="表示">
             </form>
         </div>
         <div class="box">

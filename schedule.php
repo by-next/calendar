@@ -1,6 +1,5 @@
 <?php
 
-include 'db.php';
 // getで日にち取得
 $year_month_day = isset($_GET['ymd']) ? $_GET['ymd'] : date('Y-n-d');
 $timestamp = strtotime($year_month_day);
@@ -102,6 +101,30 @@ function optionLoop($start, $end, $value = null){
 var_dump($start_time);
 
 
+$post_data = $_POST;
+
+//開始時間と終了時間
+$start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
+$end_time   = $post_data['end_hour'].':'.$post_data['end_min'].':00';
+
+
+
+// if (!isset($_POST['start_hour']) || $_POST['start_hour'] === '') {
+//     $errors[] = '時間が入力されていません';
+// }
+
+if(isset($_COOKIE['serial'])) {
+    $valid = unserialize($_COOKIE['serial']);
+    extract($valid, EXTR_SKIP);
+    //var_dump($valid);
+    /*
+    foreach($valid as $val) {
+        echo $val . "<br />";
+    }
+    */
+}
+
+
 ?>
 
 
@@ -114,8 +137,8 @@ var_dump($start_time);
 </head>
 <body>
     <h1>スケジュール登録</h1>
-    <div>
-        <table border="1">
+    <div class="wrapper">
+        <table class="schedule_table">
             <caption>スケジュール編集</caption>
             <thead>
                 <tr>
@@ -125,25 +148,25 @@ var_dump($start_time);
             <tbody>
                 <tr>
                     <td>
-                        <form class="submit_insert" method="post" action="http://kensyu.aucfan.com/redirect_sql.php?year=<?php echo $year ?>&month=<?php echo $month?>">
+                        <form method="post" action="http://kensyu.aucfan.com/redirect_sql.php?year=<?php echo $year ?>&month=<?php echo $month?>">
                         開始日
-                        <select name="start_year">
+                        <select name="start_year" class="submit_time">
                             <?php for ($i=$s_combo_year; $i <= $e_combo_year; $i++) : ?>
                                 <option value="<?php echo $i ?>"<?php if($i == $s_year) echo 'selected' ?>><?php echo $i ?></option>
                             <?php endfor ?>
                         </select>年
-                        <select name="start_month" value="<?php echo $month;?>">
+                        <select name="start_month" class="submit_time" value="<?php echo $month;?>">
                             <?php optionLoop($month_min,$month_max,$s_month);?>
                         </select>月
-                        <select name="start_day" value="<?php echo $day;?>">
+                        <select name="start_day" class="submit_time" value="<?php echo $day;?>">
                             <?php optionLoop($day_min,$day_max,$s_day);?>
                         </select>日
-                        <select name="start_hour">
+                        <select name="start_hour" class="submit_time">
                             <?php for ($i=1; $i<24; $i++):?>
                             <option name="start_hour" value="<?php echo $i;?>"<?php if ($i == $s_hour):?>selected<?php endif;?>><?php echo $i ?></option>
                             <?php endfor; ?>
                         </select>時
-                        <select name="start_min" >
+                        <select name="start_min" class="submit_time">
                             <option class="start_min" value="00">00</option>
                             <option class="start_min" value="30">30</option>
                         </select>分
@@ -152,23 +175,24 @@ var_dump($start_time);
                 <tr>
                     <td>
                         終了日
-                        <select name="end_year">
+                        <?php ?>
+                        <select name="end_year" class="submit_time">
                             <?php for ($i=$s_combo_year; $i <= $e_combo_year; $i++) : ?>
                                 <option value="<?php echo $i ?>"<?php if($i == $end_year) echo 'selected' ?>><?php echo $i ?></option>
                             <?php endfor ?>
                         </select>年
-                        <select name="end_month" value="<?php echo $end_month;?>">
+                        <select name="end_month" class="submit_time" value="<?php echo $end_month;?>">
                             <?php optionLoop($month_min,$month_max,$end_month);?>
                         </select>月
-                        <select name="end_day" value="<?php echo $end_day;?>">
+                        <select name="end_day" class="submit_time" value="<?php echo $end_day;?>">
                             <?php optionLoop($day_min,$day_max,$end_day);?>
                         </select>日
-                        <select name="end_hour">
+                        <select name="end_hour" class="submit_time">
                             <?php for ($i=1; $i<24; $i++):?>
                             <option name="end_hour" value="<?php echo $i;?>"<?php if ($i == $end_hour):?>selected<?php endif;?>><?php echo $i ?></option>
                             <?php endfor; ?>
                         </select>時
-                        <select name="end_min">
+                        <select name="end_min" class="submit_time">
                             <option class="s_min" value="00">00</option>
                             <option class="s_min" value="30">30</option>
                         </select>分
@@ -178,36 +202,35 @@ var_dump($start_time);
                     <td>タイトル</td>
                 </tr>
                 <tr>
-                    <td><input type="text" id="schedule_title" name="schedule_title" value="<?php echo $schedules[$s_year][$s_month][$s_day][$schedule_id]['title'];?>" /></td>
+                    <td><?php if(isset($schedule_title)) echo $schedule_title; ?><br /><input type="text" class="submit_text" name="schedule_title" value="<?php echo $schedules[$s_year][$s_month][$s_day][$schedule_id]['title'];?>" /></td>
                 </tr>
                 <tr>
                     <td>スケジュール内容</td>
                 </tr>
                 <tr>
-                    <td>
-                        <textarea id="schedule_contents" name="schedule_contents" rows="7" cols="60"><?php echo $schedules[$s_year][$s_month][$s_day][$schedule_id]['contents'];?></textarea>
+                    <td><?php if(isset($schedule_contents)) echo $schedule_contents; ?><br />
+                        <textarea class="submit_text" name="schedule_contents" rows="7" cols="60"><?php echo $schedules[$s_year][$s_month][$s_day][$schedule_id]['contents'];?></textarea>
                         <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
                     </td>
                 </tr>
                 <tr>
                     <td>
                         <?php if(!empty($schedule_id)):?>
-                            <input class="submit_button" type="submit" value="更新" />
+                            <input class="submit_btn regist_update" type="submit" value="更新" />
                         <?php else:?>
-                            <input class="submit_button" type="submit" value="登録" />
+                            <input class="submit_btn regist_update" type="submit" value="登録" />
                         <?php endif;?>
                         </form>
-                        
                         <form class="delete" method="post" action="http://kensyu.aucfan.com/redirect_sql.php">
                             <input type="hidden" name="delete" value="delete" />
                             <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
-                            <input id="submit_delete" type="submit" value="削除" />
+                            <input class="submit_btn delete" type="submit" value="削除" />
                         </form>
                     </td>  
                 </tr>
             </tbody>
+            <input type="button" class="submit_btn_back" value="&lt; 前に戻る" onclick="history.back()" />
         </table>
-        <input type="button" value="&lt; 前に戻る" onclick="history.back()" />
     </div>
 </body>
 </html>

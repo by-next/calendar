@@ -200,7 +200,6 @@ $e_combo_year = $year+5;
                                     $class .= 'topic ';
                                 }
                                 if($date_str == $today){
-                                    echo $day;
                                     $class .= 'today';
                                 }
                                 ?>

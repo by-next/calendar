@@ -1,15 +1,8 @@
 <?php
-
 session_start();
 session_destroy();
 
-require_once('db.php');
-
-// 日付のタームゾーンを変更
-ini_set("date.timezone", "Asia/Tokyo");
-
-// googleAPI祝日取得
-define("CALENDAR_URL", "outid3el0qkcrsuf89fltf7a4qbacgt9@import.calendar.google.com");
+require_once('file_load.php');
 
 if(isset($_GET['year']) && $_GET['year'] != '' && isset($_GET['month']) && $_GET['month'] != ''){
     $year  = $_GET['year'];
@@ -21,19 +14,16 @@ if(isset($_GET['year']) && $_GET['year'] != '' && isset($_GET['month']) && $_GET
 }
 
 $today   = date('Y-m-d');// 本日取得
-// var_dump($today);
 
 $month_date       = date('t', mktime(0, 0, 0, $month, 1, $year));// 月の日数表示(4月なら30日分)
 $month_begin_cell = date('w', mktime(0, 0, 0, $month, 1, $year));// 当月の曜日の数値取得
 $last_day         = date('w', mktime(0, 0, 0, $month, $month_date, $year));// 月末の曜日の数値の取得
 $month_end_cell   = 6-$last_day;// 空マス計算
 
-
 // カレンダー表示配列
 $calendars = array();
 // カレンダー表示数
 $calendar_count = 3;
-
 
 // 真ん中にくる月計算
 $half = floor($calendar_count/2);
@@ -68,55 +58,8 @@ $next = array(
     'month' => date('m', strtotime('next month', $half_month))
 );
 
-
-//+祝日取得開始
-function getGoogleCalender($min_date, $max_date){
-// 祝日の配列
-    $holidays = array();
-// google apiのurl
-    $url = 'http://www.google.com/calendar/feeds/%s/public/full-noattendees?%s';
-// パラメータ
-    $params = array(
-        'start-min'   => $min_date,
-        'start-max'   => $max_date,
-        'max-results' => 30,
-        'alt'         => 'json',
-        );
-    $queryString = http_build_query($params);
-// URLを取得
-    $getUrl = sprintf($url, CALENDAR_URL, $queryString);
-// データ取得
-    if($results = file_get_contents($getUrl)){
-// デコードしたデータ
-        $resultsDecode = json_decode($results, true);
-// 休日を設定するリスト
-        $holidays = array();
-// リスト分出力
-        foreach ($resultsDecode['feed']['entry'] as $key => $val){
-// 日付
-            $date = $val['gd$when'][0]['startTime'];
-// タイトル
-            $title = $val['title']['$t'];
-            $title = explode(' / ', $title);
-// 日付をキーに設定
-            $holidays[$date] = $title[0];
-        }
-    }
-    return $holidays;
-}
-
-// 現在の年より年初～年末までを取得
-$nowYear = date('Y');
-$holiday_first = date('Y-m-d', strtotime("{$nowYear}0101"));
-$holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
-
-// 祝日出力
-$holidays = getGoogleCalender($holiday_first, $holiday_end);
-
-
 // +オクトピ取得
 $rss  = simplexml_load_file('http://aucfan.com/article/feed/');// フィード取得URL
-
 
 $date  = array();// 日付の値挿入
 $title = array();// オクトピタイトル挿入
@@ -164,7 +107,7 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
         $n_month = $s_month;
         $n_year  = $s_year;
 
-// for($i=1;strtotime($array_row['start_time'].'+'.$i.' day')<=strtotime($array_row['end_time']);$i++)
+        // for($i=1;strtotime($array_row['start_time'].'+'.$i.' day')<=strtotime($array_row['end_time']);$i++)
 
         while ($n_day != $end_s_day || $n_month != $end_s_month || $n_year != $end_s_year) {
             $ymd_day = date('Y-m-j',strtotime('tomorrow',strtotime($n_year.'-'.$n_month.'-'.$n_day)));
@@ -180,8 +123,7 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
 }
 mysqli_close($db_connect);
 
-
-// コンボボックス
+// 可変年コンボボックス
 $s_combo_year = $year-5;
 $e_combo_year = $year+5;
 
@@ -258,6 +200,7 @@ $e_combo_year = $year+5;
                                     $class .= 'topic ';
                                 }
                                 if($date_str == $today){
+                                    echo $day;
                                     $class .= 'today';
                                 }
                                 ?>
@@ -267,14 +210,14 @@ $e_combo_year = $year+5;
 
                                     <!-- 祝日 -->
                                     <?php if($holidays):?>
-                                        <?php echo $holidays[$date_str]; ?><br />
+                                        <?php echo h($holidays[$date_str]); ?><br />
                                     <?php endif ?>
 
                                     <!-- オクトピ -->
                                     <?php if(!empty($auc_topic[$date_str])):?>
                                         <a class="topic" href="<?php echo $auc_link[$date_str];?>" target="_blank" >
                                             <?php echo mb_strimwidth($auc_topic[$date_str], 0, 13,'…'); ?>
-                                            <span><strong>トピック内容</strong><br /><?php echo mb_strimwidth($auc_topic[$date_str], 0, 50,'…'); ?></span>
+                                            <span><strong>トピック内容</strong><br /><?php echo h(mb_strimwidth($auc_topic[$date_str], 0, 50,'…')); ?></span>
                                         </a>
                                     <?php endif ?>
 
@@ -282,8 +225,8 @@ $e_combo_year = $year+5;
                                     <?php $tmp = $schedules[$calendar['year']][$calendar['month']][$day];
                                     if(!empty($tmp)) foreach ($tmp as $schedule) : ?>
                                         <a class="tooltip" href="schedule.php?ymd=<?php echo $date_str; ?>&id=<?php echo $schedule['schedule_id'] ?>">
-                                            <?php echo mb_strimwidth($schedule['title'], 0, 10,'…'); ?><br />
-                                            <span><strong>スケジュール内容</strong><br /><?php echo mb_strimwidth($schedule['contents'], 0, 30,'…'); ?></span>
+                                            <?php echo h(mb_strimwidth($schedule['title'], 0, 10,'…')); ?><br />
+                                            <span><strong>スケジュール内容</strong><br /><?php echo h(mb_strimwidth($schedule['contents'], 0, 30,'…')); ?></span>
                                         </a>
                                     <?php endforeach ?>
 

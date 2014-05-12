@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once('db.php');
+require_once('file_load.php');
 
 // getで日にち取得
 $year_month_day = isset($_GET['ymd']) ? $_GET['ymd'] : date('Y-n-d');
@@ -51,7 +51,6 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
 }
 mysqli_close($db_connect);
 
-
 if (!isset($schedule_id)) {
     $s_year    = $end_year  = $year;
     $s_month   = $end_month = $month;
@@ -71,8 +70,8 @@ if (!isset($schedule_id)) {
     $end_min   = $end_s_min;
 }
 
+//スケジュールid,title,contents取得配列
 $schedule = $schedules[$s_year][$s_month][$s_day];
-var_dump($schedules);
 
 //コンボボックス年前後5年表示
 $s_combo_year = $year-5;
@@ -94,11 +93,8 @@ function optionLoop($start, $end, $value = null){
     }
 }
 
-//開始時間と終了時間
 if (! isset($_SESSION['post'])) {
     // カレンダーから来た時
-    // $start_time = ;
-    // $end_time   = ;
     $schedule_title = $schedule['title'];
     $schedule_contents = $schedule['contents'];
 } else {
@@ -184,14 +180,14 @@ if (! isset($_SESSION['post'])) {
                     <td>タイトル</td>
                 </tr>
                 <tr>
-                    <td><?php if(isset($_SESSION['error']['title_error'])) echo $_SESSION['error']['title_error']; ?><br /><input type="text" class="submit_text" name="schedule_title" value="<?php echo $schedule_title;?>" /></td>
+                    <td><?php if(isset($_SESSION['error']['title_error'])) echo $_SESSION['error']['title_error']; ?><br /><input type="text" class="submit_text" name="schedule_title" value="<?php echo h($schedule_title);?>" /></td>
                 </tr>
                 <tr>
                     <td>スケジュール内容</td>
                 </tr>
                 <tr>
                     <td><?php if(isset($_SESSION['error']['contents_error'])) echo $_SESSION['error']['contents_error']; ?><br />
-                        <textarea class="submit_text" name="schedule_contents" rows="7" cols="60"><?php echo $schedule_contents;?></textarea>
+                        <textarea class="submit_text" name="schedule_contents" rows="7" cols="60"><?php echo h($schedule_contents);?></textarea>
                         <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
                     </td>
                 </tr>

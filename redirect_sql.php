@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once('db.php');
+require_once('file_load.php');
 
 $year = $_GET['year'];
 $month = $_GET['month'];

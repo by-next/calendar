@@ -1,5 +1,4 @@
 <?php
-
 function db_connect(){
 // DB接続
     $host = 'localhost';
@@ -17,5 +16,4 @@ function db_connect(){
     return $connect;
 }
 $db_connect = db_connect();
-
 ?> 

@@ -1,6 +1,5 @@
 <?php
 session_start();
-session_destroy();
 
 require_once('file_load.php');
 
@@ -58,6 +57,15 @@ $next = array(
     'month' => date('m', strtotime('next month', $half_month))
 );
 
+// 現在の年より年初～年末までを取得
+$nowYear = date('Y');
+$holiday_first = date('Y-m-d', strtotime("{$nowYear}0101"));
+$holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
+
+// 祝日出力
+$holidays = getGoogleCalender($holiday_first, $holiday_end);
+
+
 // +オクトピ取得
 $rss  = simplexml_load_file('http://aucfan.com/article/feed/');// フィード取得URL
 
@@ -74,6 +82,7 @@ foreach ( $rss->channel->item as $key => $value) {
     $auc_link[$date]  = $link;
 }
 
+$db_connect = db_connect();
 //スケジュール表示
 $schedule_sql =<<<EOD
 

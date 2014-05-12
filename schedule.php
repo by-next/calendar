@@ -22,6 +22,8 @@ $update ='';
 $schedule_id = $_GET['id'];
 $date = sprintf('%02d', $day);
 
+$db_connect = db_connect();
+
 //idがある場合の表示SQL
 $schedule_sql =<<<EOD
     SELECT

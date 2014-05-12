@@ -1,6 +1,6 @@
 <?php
-function db_connect(){
 // DB接続
+function db_connect(){
     $host = 'localhost';
     $user = 'root';
     $password = '';
@@ -15,5 +15,4 @@ function db_connect(){
     }
     return $connect;
 }
-$db_connect = db_connect();
-?> 
+?>

@@ -37,6 +37,7 @@ if(!$delete && !empty($_SESSION['error'])) {
     return header("location: http://kensyu.aucfan.com/schedule.php?year=".$year."&month=".$month);    
 }
 
+$db_connect = db_connect();
 //SQL処理開始
 if (empty($id) && ($schedule_title != null)) {
 
@@ -86,6 +87,7 @@ EOD;
 if (isset($start_time) && !empty($sql)) {
     $sql_result = mysqli_query($db_connect, $sql);
 }
+session_destroy();
 
 return header("location: http://kensyu.aucfan.com/?year=".$year."&month=".$month);
 

@@ -1,4 +1,7 @@
 <?php
+session_start();
+
+require_once('db.php');
 
 // getで日にち取得
 $year_month_day = isset($_GET['ymd']) ? $_GET['ymd'] : date('Y-n-d');
@@ -9,7 +12,7 @@ if ($timestamp === false) {
 
 // 時分
 $hour = date('G');
-$min = date('i');
+$min  = date('i');
 
 // 日にちを文字列の分解
 $sdate = $year_month_day;
@@ -19,22 +22,7 @@ $update ='';
 $schedule_id = $_GET['id'];
 $date = sprintf('%02d', $day);
 
-// DB接続
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'cal';
-
-// MySQLに接続し、データベースを選択
-$connect = mysqli_connect($host, $user, $password, $database);
-
-// 接続状況をチェック
-if (mysqli_connect_errno()) {
-    die(mysqli_connect_error());
-}
-
-
-//表示SQL
+//idがある場合の表示SQL
 $schedule_sql =<<<EOD
     SELECT
          schedule_id, start_time, end_time, schedule_title, schedule_contents
@@ -49,16 +37,20 @@ $schedule_sql =<<<EOD
 EOD;
 
 // SQL実行後値を格納
-if ($result = mysqli_query($connect, $schedule_sql)) {
+if ($result = mysqli_query($db_connect, $schedule_sql)) {
     while ($array_row= mysqli_fetch_array($result, MYSQLI_ASSOC)) {
         list($s_year, $s_month, $s_day, $s_hour, $s_min) = explode('-', date('Y-m-j-G-i',strtotime($array_row['start_time'])));
         list($end_s_year, $end_s_month, $end_s_day,$end_s_hour,$end_s_min) = explode('-', date('Y-m-j-G-i',strtotime($array_row['end_time'])));
-        $schedules[$s_year][$s_month][$s_day][$array_row['schedule_id']]['title'] = $array_row['schedule_title'];
-        $schedules[$s_year][$s_month][$s_day][$array_row['schedule_id']]['contents'] = $array_row['schedule_contents'];
+        $schedules[$s_year][$s_month][$s_day] = array(
+            'title'       => $array_row['schedule_title'],
+            'contents'    => $array_row['schedule_contents'],
+            'schedule_id' => $array_row['schedule_id']
+        );
     }
     mysqli_free_result($result);
 }
-mysqli_close($connect);
+mysqli_close($db_connect);
+
 
 if (!isset($schedule_id)) {
     $s_year    = $end_year  = $year;
@@ -79,6 +71,8 @@ if (!isset($schedule_id)) {
     $end_min   = $end_s_min;
 }
 
+$schedule = $schedules[$s_year][$s_month][$s_day];
+
 //コンボボックス年前後5年表示
 $s_combo_year = $year-5;
 $e_combo_year = $year+5;
@@ -98,30 +92,20 @@ function optionLoop($start, $end, $value = null){
         }
     }
 }
-var_dump($start_time);
-
-
-$post_data = $_POST;
 
 //開始時間と終了時間
-$start_time = $post_data['start_hour'].':'.$post_data['start_min'].':00';
-$end_time   = $post_data['end_hour'].':'.$post_data['end_min'].':00';
-
-
-
-// if (!isset($_POST['start_hour']) || $_POST['start_hour'] === '') {
-//     $errors[] = '時間が入力されていません';
-// }
-
-if(isset($_COOKIE['serial'])) {
-    $valid = unserialize($_COOKIE['serial']);
-    extract($valid, EXTR_SKIP);
-    //var_dump($valid);
-    /*
-    foreach($valid as $val) {
-        echo $val . "<br />";
-    }
-    */
+if (! isset($_SESSION['post'])) {
+    // カレンダーから来た時
+    // $start_time = ;
+    // $end_time   = ;
+    $schedule_title = $schedule['title'];
+    $schedule_contents = $schedule['contents'];
+} else {
+    // リダイレクトで来た時
+    $start_time = $_SESSION['post']['start_year'].'-'.$_SESSION['post']['start_month'].'-'.$_SESSION['post']['start_day'].' '.$_SESSION['post']['start_hour'].':'.$_SESSION['post']['start_min'].':00';
+    $end_time   = $_SESSION['post']['end_year'].'-'.$_SESSION['post']['end_month'].'-'.$_SESSION['post']['end_day'].' '.$_SESSION['post']['end_hour'].':'.$_SESSION['post']['end_min'].':00';
+    $schedule_title = $_SESSION['post']['schedule_title'];
+    $schedule_contents = $_SESSION['post']['schedule_contents'];
 }
 
 
@@ -173,9 +157,8 @@ if(isset($_COOKIE['serial'])) {
                     </td>  
                 </tr>
                 <tr>
-                    <td>
+                    <td><?php if(isset($_SESSION['error']['time_error'])) echo $_SESSION['error']['time_error']; ?><br />
                         終了日
-                        <?php ?>
                         <select name="end_year" class="submit_time">
                             <?php for ($i=$s_combo_year; $i <= $e_combo_year; $i++) : ?>
                                 <option value="<?php echo $i ?>"<?php if($i == $end_year) echo 'selected' ?>><?php echo $i ?></option>
@@ -202,14 +185,14 @@ if(isset($_COOKIE['serial'])) {
                     <td>タイトル</td>
                 </tr>
                 <tr>
-                    <td><?php if(isset($schedule_title)) echo $schedule_title; ?><br /><input type="text" class="submit_text" name="schedule_title" value="<?php echo $schedules[$s_year][$s_month][$s_day][$schedule_id]['title'];?>" /></td>
+                    <td><?php if(isset($_SESSION['error']['title_error'])) echo $_SESSION['error']['title_error']; ?><br /><input type="text" class="submit_text" name="schedule_title" value="<?php echo $schedule_title;?>" /></td>
                 </tr>
                 <tr>
                     <td>スケジュール内容</td>
                 </tr>
                 <tr>
-                    <td><?php if(isset($schedule_contents)) echo $schedule_contents; ?><br />
-                        <textarea class="submit_text" name="schedule_contents" rows="7" cols="60"><?php echo $schedules[$s_year][$s_month][$s_day][$schedule_id]['contents'];?></textarea>
+                    <td><?php if(isset($_SESSION['error']['contents_error'])) echo $_SESSION['error']['contents_error']; ?><br />
+                        <textarea class="submit_text" name="schedule_contents" rows="7" cols="60"><?php echo $schedule_contents;?></textarea>
                         <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
                     </td>
                 </tr>
@@ -224,7 +207,7 @@ if(isset($_COOKIE['serial'])) {
                         <form class="delete" method="post" action="http://kensyu.aucfan.com/redirect_sql.php">
                             <input type="hidden" name="delete" value="delete" />
                             <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
-                            <input class="submit_btn delete" type="submit" value="削除" />
+                            <input class="submit_btn delete" type="submit" name="delete" value="削除" />
                         </form>
                     </td>  
                 </tr>

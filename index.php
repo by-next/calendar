@@ -1,4 +1,10 @@
 <?php
+
+session_start();
+session_destroy();
+
+require_once('db.php');
+
 // 日付のタームゾーンを変更
 ini_set("date.timezone", "Asia/Tokyo");
 
@@ -22,10 +28,13 @@ $month_begin_cell = date('w', mktime(0, 0, 0, $month, 1, $year));// 当月の曜
 $last_day         = date('w', mktime(0, 0, 0, $month, $month_date, $year));// 月末の曜日の数値の取得
 $month_end_cell   = 6-$last_day;// 空マス計算
 
+
 // カレンダー表示配列
 $calendars = array();
 // カレンダー表示数
 $calendar_count = 3;
+
+
 // 真ん中にくる月計算
 $half = floor($calendar_count/2);
 // 真ん中の月
@@ -60,55 +69,54 @@ $next = array(
 );
 
 
-// +祝日取得開始
-// function getGoogleCalender($min_date, $max_date){
-// // 祝日の配列
-//     $holidays = array();
-// // google apiのurl
-//     $url = 'http://www.google.com/calendar/feeds/%s/public/full-noattendees?%s';
-// // パラメータ
-//     $params = array(
-//         'start-min'   => $min_date,
-//         'start-max'   => $max_date,
-//         'max-results' => 30,
-//         'alt'         => 'json',
-//         );
-//     $queryString = http_build_query($params);
-// // URLを取得
-//     $getUrl = sprintf($url, CALENDAR_URL, $queryString);
-// // データ取得
-//     if($results = file_get_contents($getUrl)){
-// // デコードしたデータ
-//         $resultsDecode = json_decode($results, true);
-// // 休日を設定するリスト
-//         $holidays = array();
-// // リスト分出力
-//         foreach ($resultsDecode['feed']['entry'] as $key => $val){
-// // 日付
-//             $date = $val['gd$when'][0]['startTime'];
-// // タイトル
-//             $title = $val['title']['$t'];
-//             $title = explode(' / ', $title);
-// // 日付をキーに設定
-//             $holidays[$date] = $title[0];
-//         }
-//     }
-//     return $holidays;
-// }
+//+祝日取得開始
+function getGoogleCalender($min_date, $max_date){
+// 祝日の配列
+    $holidays = array();
+// google apiのurl
+    $url = 'http://www.google.com/calendar/feeds/%s/public/full-noattendees?%s';
+// パラメータ
+    $params = array(
+        'start-min'   => $min_date,
+        'start-max'   => $max_date,
+        'max-results' => 30,
+        'alt'         => 'json',
+        );
+    $queryString = http_build_query($params);
+// URLを取得
+    $getUrl = sprintf($url, CALENDAR_URL, $queryString);
+// データ取得
+    if($results = file_get_contents($getUrl)){
+// デコードしたデータ
+        $resultsDecode = json_decode($results, true);
+// 休日を設定するリスト
+        $holidays = array();
+// リスト分出力
+        foreach ($resultsDecode['feed']['entry'] as $key => $val){
+// 日付
+            $date = $val['gd$when'][0]['startTime'];
+// タイトル
+            $title = $val['title']['$t'];
+            $title = explode(' / ', $title);
+// 日付をキーに設定
+            $holidays[$date] = $title[0];
+        }
+    }
+    return $holidays;
+}
 
-// // 現在の年より年初～年末までを取得
-// $nowYear = date('Y');
-// $holiday_first = date('Y-m-d', strtotime("{$nowYear}0101"));
-// $holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
+// 現在の年より年初～年末までを取得
+$nowYear = date('Y');
+$holiday_first = date('Y-m-d', strtotime("{$nowYear}0101"));
+$holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
 
-// // 祝日出力
-// $holidays = getGoogleCalender($holiday_first, $holiday_end);
+// 祝日出力
+$holidays = getGoogleCalender($holiday_first, $holiday_end);
 
 
 // +オクトピ取得
 $rss  = simplexml_load_file('http://aucfan.com/article/feed/');// フィード取得URL
 
-var_dump($rss);
 
 $date  = array();// 日付の値挿入
 $title = array();// オクトピタイトル挿入
@@ -123,23 +131,7 @@ foreach ( $rss->channel->item as $key => $value) {
     $auc_link[$date]  = $link;
 }
 
-//DB接続
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'cal';
-
-// MySQL に接続し、データベースを選択
-$connect = mysqli_connect($host, $user, $password, $database);
-
-// 接続状況をチェック
-if (mysqli_connect_errno()) {
-    die(mysqli_connect_error());
-}
-
-
-
-//削除は非表示
+//スケジュール表示
 $schedule_sql =<<<EOD
 
     SELECT
@@ -152,7 +144,8 @@ $schedule_sql =<<<EOD
          null
 EOD;
 
-if ($result = mysqli_query($connect, $schedule_sql)) {
+
+if ($result = mysqli_query($db_connect, $schedule_sql)) {
     while ($array_row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
         list($s_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($array_row['start_time'])));
         list($end_s_year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($array_row['end_time'])));
@@ -163,7 +156,6 @@ if ($result = mysqli_query($connect, $schedule_sql)) {
         );
 
         if (strtotime($array_row['start_time']) >= strtotime($array_row['end_time'])) {
-            var_dump($array_row['start_time'], $array_row['end_time']);
             continue;
         }
 
@@ -186,10 +178,9 @@ if ($result = mysqli_query($connect, $schedule_sql)) {
     }
     mysqli_free_result($result);
 }
-mysqli_close($connect);
+mysqli_close($db_connect);
 
 
-var_dump($st_year);
 // コンボボックス
 $s_combo_year = $year-5;
 $e_combo_year = $year+5;

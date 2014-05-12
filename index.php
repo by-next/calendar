@@ -164,7 +164,7 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
         $n_month = $s_month;
         $n_year  = $s_year;
 
-        // for($i=1;strtotime($array_row['start_time'].'+'.$i.' day')<=strtotime($array_row['end_time']);$i++)
+// for($i=1;strtotime($array_row['start_time'].'+'.$i.' day')<=strtotime($array_row['end_time']);$i++)
 
         while ($n_day != $end_s_day || $n_month != $end_s_month || $n_year != $end_s_year) {
             $ymd_day = date('Y-m-j',strtotime('tomorrow',strtotime($n_year.'-'.$n_month.'-'.$n_day)));

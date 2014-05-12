@@ -8,6 +8,7 @@ $month = $_GET['month'];
 
 //フォームからのpostデータを格納
 $post_data = $_POST;
+
 $_SESSION['post'] = $post_data;
 
 //開始時間と終了時間
@@ -16,9 +17,9 @@ $end_time   = $_SESSION['post']['end_year'].'-'.$_SESSION['post']['end_month'].'
 //予定のタイトルと内容
 $schedule_title = $_SESSION['post']['schedule_title'];
 $schedule_contents = $_SESSION['post']['schedule_contents'];
+
 $id = $_SESSION['post']['schedule_id'];
 $delete = $_SESSION['post']['delete'];
-
 
 //エラーの分岐処理正しいならカレンダーへ誤りならスケジュールへ
 if (strtotime($start_time) > strtotime($end_time)){
@@ -32,7 +33,7 @@ if (!isset($schedule_contents) || $schedule_contents === '') {
 }
 $_SESSION['error'] = $msg;
 
-if(isset($_SESSION['error'])) {
+if(!$delete && !empty($_SESSION['error'])) {
     return header("location: http://kensyu.aucfan.com/schedule.php?year=".$year."&month=".$month);    
 }
 
@@ -52,7 +53,7 @@ $sql=<<<EOD
         deleted_at        = null
 EOD;
 
-} elseif(!empty($id) && empty($delete)) {
+} elseif(isset($id) && !isset($delete)) {
 
 $sql=<<<EOD
     UPDATE
@@ -67,7 +68,7 @@ $sql=<<<EOD
         schedule_id       = "$id"
 EOD;
 
-} elseif($delete === 'delete') {
+} else {
 
 $sql=<<<EOD
     UPDATE

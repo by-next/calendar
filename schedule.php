@@ -72,6 +72,7 @@ if (!isset($schedule_id)) {
 }
 
 $schedule = $schedules[$s_year][$s_month][$s_day];
+var_dump($schedules);
 
 //コンボボックス年前後5年表示
 $s_combo_year = $year-5;
@@ -108,9 +109,7 @@ if (! isset($_SESSION['post'])) {
     $schedule_contents = $_SESSION['post']['schedule_contents'];
 }
 
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -130,9 +129,9 @@ if (! isset($_SESSION['post'])) {
                 </tr>
             </thead>
             <tbody>
+                <form method="post" action="http://kensyu.aucfan.com/redirect_sql.php?year=<?php echo $year ?>&month=<?php echo $month?>">
                 <tr>
                     <td>
-                        <form method="post" action="http://kensyu.aucfan.com/redirect_sql.php?year=<?php echo $year ?>&month=<?php echo $month?>">
                         開始日
                         <select name="start_year" class="submit_time">
                             <?php for ($i=$s_combo_year; $i <= $e_combo_year; $i++) : ?>
@@ -200,19 +199,19 @@ if (! isset($_SESSION['post'])) {
                     <td>
                         <?php if(!empty($schedule_id)):?>
                             <input class="submit_btn regist_update" type="submit" value="更新" />
+                            <button class="submit_btn delete" type="submit" name="delete" value="delete">削除</button>
                         <?php else:?>
                             <input class="submit_btn regist_update" type="submit" value="登録" />
                         <?php endif;?>
-                        </form>
-                        <form class="delete" method="post" action="http://kensyu.aucfan.com/redirect_sql.php">
-                            <input type="hidden" name="delete" value="delete" />
-                            <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
-                            <input class="submit_btn delete" type="submit" name="delete" value="削除" />
-                        </form>
                     </td>  
                 </tr>
+                </form>
+                <tr>
+                    <td>
+                        <a href="index.php" class="submit_btn">&lt;&nbsp;戻る</a>
+                    </td>
+                </tr>
             </tbody>
-            <input type="button" class="submit_btn_back" value="&lt; 前に戻る" onclick="history.back()" />
         </table>
     </div>
 </body>

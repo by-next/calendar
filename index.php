@@ -99,9 +99,9 @@ EOD;
 
 if ($result = mysqli_query($db_connect, $schedule_sql)) {
     while ($array_row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-        list($s_year, $s_month, $s_day) = explode('-', date('Y-m-j',strtotime($array_row['start_time'])));
+        list($start_year, $start_month, $start_day) = explode('-', date('Y-m-j',strtotime($array_row['start_time'])));
         list($end_s_year, $end_s_month, $end_s_day) = explode('-', date('Y-m-j',strtotime($array_row['end_time'])));
-        $schedules[$s_year][$s_month][$s_day][] = array(
+        $schedules[$start_year][$start_month][$start_day][] = array(
             'title'       => $array_row['schedule_title'],
             'contents'    => $array_row['schedule_contents'],
             'schedule_id' => $array_row['schedule_id']
@@ -112,9 +112,9 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
         }
 
 //一致した日に＋1日して予定吐き出し
-        $n_day   = $s_day;
-        $n_month = $s_month;
-        $n_year  = $s_year;
+        $n_day   = $start_day;
+        $n_month = $start_month;
+        $n_year  = $start_year;
 
         // for($i=1;strtotime($array_row['start_time'].'+'.$i.' day')<=strtotime($array_row['end_time']);$i++)
 
@@ -133,7 +133,7 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
 mysqli_close($db_connect);
 
 // 可変年コンボボックス
-$s_combo_year = $year-5;
+$start_combo_year = $year-5;
 $e_combo_year = $year+5;
 
 ?>
@@ -157,7 +157,7 @@ $e_combo_year = $year+5;
             <a href="<?php echo '?year='.$next['year'].'&month='.$next['month'] ?>" class="button medium">次月</a>
             <form method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
                 <select class="submit_btn" name="year">
-                    <?php for ($i=$s_combo_year; $i <= $e_combo_year; $i++) : ?>
+                    <?php for ($i=$start_combo_year; $i <= $e_combo_year; $i++) : ?>
                         <option value="<?php echo $i ?>"<?php if($i == $year) echo 'selected' ?>><?php echo $i ?></option>
                     <?php endfor ?>
                 </select>年
@@ -214,7 +214,7 @@ $e_combo_year = $year+5;
                                 ?>
                                 <td class="<?php echo $class ?>">
                                     <!-- 日付出力 -->
-                                    <a href="schedule.php?ymd=<?php echo $date_str; ?>"><?php echo $day;?></a>
+                                    <a href="schedule.php?year=<?php echo $calendar['year']; ?>&month=<?php echo $calendar['month']; ?>&day=<?php echo $day; ?>"><?php echo $day;?></a>
 
                                     <!-- 祝日 -->
                                     <?php if($holidays):?>
@@ -232,7 +232,7 @@ $e_combo_year = $year+5;
                                     <!-- 予定 -->
                                     <?php $tmp = $schedules[$calendar['year']][$calendar['month']][$day];
                                     if(!empty($tmp)) foreach ($tmp as $schedule) : ?>
-                                        <a class="tooltip" href="schedule.php?ymd=<?php echo $date_str; ?>&id=<?php echo $schedule['schedule_id'] ?>">
+                                        <a class="tooltip" href="schedule.php?year=<?php echo $calendar['year']; ?>&month=<?php echo $calendar['month']; ?>&day=<?php echo $day; ?>&id=<?php echo $schedule['schedule_id'] ?>">
                                             <?php echo h(mb_strimwidth($schedule['title'], 0, 10,'…')); ?><br />
                                             <span><strong>スケジュール内容</strong><br /><?php echo h(mb_strimwidth($schedule['contents'], 0, 30,'…')); ?></span>
                                         </a>

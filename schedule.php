@@ -26,8 +26,6 @@ if(isset($_SESSION['post']['start_day']) && $_SESSION['post']['start_day'] != $d
     echo "uoooo</br>";
     //session_unset();
 }
-var_dump($_SESSION);
-
 
 $db_connect = db_connect();
 

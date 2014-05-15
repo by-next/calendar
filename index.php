@@ -6,7 +6,6 @@ require_once('file_load.php');
 if(isset($_GET['year']) && $_GET['year'] != '' && isset($_GET['month']) && $_GET['month'] != ''){
     $year  = $_GET['year'];
     $month = sprintf('%02d', $_GET['month']);
-// 指定がなければ本日の年月
 }else{
     $year  = date('Y');
     $month = date('m');
@@ -107,11 +106,9 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
             'contents'    => $array_row['schedule_contents'],
             'schedule_id' => $array_row['schedule_id']
         );
-
         if (strtotime($array_row['start_time']) >= strtotime($array_row['end_time'])) {
             continue;
         }
-
         //一致した日に＋1日して予定吐き出し
         $n_day   = $start_day;
         $n_month = $start_month;

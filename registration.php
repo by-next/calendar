@@ -19,9 +19,6 @@ $_SESSION['day']   = $day;
 // $_SESSION['year']['month']['day'] = $_SESSION['post']['schedule_title'];
 // $date = $_SESSION['year'].$_SESSION['month'].$_SESSION['day'];
 
-// var_dump($date);
-// exit;
-
 //開始時間と終了時間
 $start_time = $_SESSION['post']['start_year'].'-'.$_SESSION['post']['start_month'].'-'.$_SESSION['post']['start_day'].' '.$_SESSION['post']['start_hour'].':'.$_SESSION['post']['start_min'].':00';
 $end_time   = $_SESSION['post']['end_year'].'-'.$_SESSION['post']['end_month'].'-'.$_SESSION['post']['end_day'].' '.$_SESSION['post']['end_hour'].':'.$_SESSION['post']['end_min'].':00';

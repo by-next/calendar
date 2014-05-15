@@ -83,7 +83,6 @@ if (!isset($schedule_id)) {
 //スケジュールid,title,contents取得配列
 $schedule = $schedules[$start_year][$start_month][$start_day];
 
-
 //コンボボックス年前後5年表示
 $start_combo_year = $year-5;
 $e_combo_year = $year+5;

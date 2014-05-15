@@ -12,7 +12,6 @@ if(isset($_GET['year']) && $_GET['year'] != '' && isset($_GET['month']) && $_GET
 }
 
 $today   = date('Y-m-d');// 本日取得
-
 $month_date       = date('t', mktime(0, 0, 0, $month, 1, $year));// 月の日数表示(4月なら30日分)
 $month_begin_cell = date('w', mktime(0, 0, 0, $month, 1, $year));// 当月の曜日の数値取得
 $last_day         = date('w', mktime(0, 0, 0, $month, $month_date, $year));// 月末の曜日の数値の取得
@@ -63,7 +62,6 @@ $holiday_end   = date('Y-m-d', strtotime("{$nowYear}1231"));
 
 // 祝日出力
 $holidays = getGoogleCalender($holiday_first, $holiday_end);
-
 
 // +オクトピ取得
 $rss  = simplexml_load_file('http://aucfan.com/article/feed/');// フィード取得URL

@@ -58,7 +58,6 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
 }
 mysqli_close($db_connect);
 
-
 if (!isset($schedule_id)) {
     $start_year    = $end_year  = $year;
     $start_month   = $end_month = $month;

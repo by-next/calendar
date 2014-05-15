@@ -11,63 +11,23 @@ $day   = $_GET['day'];
 //フォームからのpostデータを格納
 $post_data = $_POST;
 
+//データをセッションに代入
 $_SESSION['post']  = $post_data;
 $_SESSION['year']  = $year;
 $_SESSION['month'] = $month;
 $_SESSION['day']   = $day;
 
-// $_SESSION['year']['month']['day'] = $_SESSION['post']['schedule_title'];
-// $date = $_SESSION['year'].$_SESSION['month'].$_SESSION['day'];
-
 //開始時間と終了時間
 $start_time = $_SESSION['post']['start_year'].'-'.$_SESSION['post']['start_month'].'-'.$_SESSION['post']['start_day'].' '.$_SESSION['post']['start_hour'].':'.$_SESSION['post']['start_min'].':00';
 $end_time   = $_SESSION['post']['end_year'].'-'.$_SESSION['post']['end_month'].'-'.$_SESSION['post']['end_day'].' '.$_SESSION['post']['end_hour'].':'.$_SESSION['post']['end_min'].':00';
 
-// $start_year  = $_SESSION['post']['start_year'];
-// $start_month = $_SESSION['post']['start_month'];
-// $start_day   = $_SESSION['post']['start_day'];
-// $start_hour  = $_SESSION['post']['start_hour'];
-// $start_min   = $_SESSION['post']['start_min'];
-
-// $end_year    = $_SESSION['post']['end_year'];
-// $end_month   = $_SESSION['post']['end_month'];
-// $end_day     = $_SESSION['post']['end_day'];  
-// $end_hour    = $_SESSION['post']['end_hour'];
-// $end_min     = $_SESSION['post']['end_min'];  
-
-// if (!checkdate($start_month, $start_day, $start_year)) {
-//     $timestamp = time();
-//     $start_year  = strtotime(date('Y', $timestamp));
-//     $start_month = date('m', $timestamp);
-//     $start_day   = date('d', $timestamp);
-// } else {
-//     $timestamp = strtotime($start_year.$start_month.$start_day);
-// }
-
-// if (!checkdate($end_month, $end_day, $end_year)) {
-//     $timestamp = time();
-//     $end_year  = date('Y', $timestamp);
-//     $end_month = date('m', $timestamp);
-//     $end_day   = date('d', $timestamp);
-// } else {
-//     $timestamp = strtotime($end_year.$end_month.$end_day);
-// }
-
-// $start_time = $start_year.$start_month.$start_day;
-// $end_time   = $end_year.$end_month.$end_day;
-
-// var_dump($start_time);
-// var_dump($end_time);
-//exit;
-
-
 //予定のタイトルと内容
 $schedule_title    = $_SESSION['post']['schedule_title'];
 $schedule_contents = $_SESSION['post']['schedule_contents'];
-
 $id     = $_SESSION['post']['schedule_id'];
 $delete = $_SESSION['post']['delete'];
 
+//バリデーションエラー格納配列
 $msg = '';
 
 //エラーの分岐処理正しいならカレンダーへ誤りならスケジュールへ
@@ -87,7 +47,9 @@ if (!empty($_SESSION['error']) ){
     return header("location: http://kensyu.aucfan.com/schedule.php?year=$year&month=$month&day=$day");    
 }
 
+//DB接続
 $db_connect = db_connect();
+
 //SQL処理開始
 if (empty($id) && !is_null($schedule_title)){
 

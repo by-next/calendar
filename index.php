@@ -11,15 +11,6 @@ if(isset($_GET['year']) && $_GET['year'] != '' && isset($_GET['month']) && $_GET
     $month = date('m');
 }
 
-
-
-
-
-
-
-
-
-
 $today   = date('Y-m-d');// 本日取得
 
 $month_date       = date('t', mktime(0, 0, 0, $month, 1, $year));// 月の日数表示(4月なら30日分)

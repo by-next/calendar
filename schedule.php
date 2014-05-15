@@ -59,11 +59,16 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
 mysqli_close($db_connect);
 
 if (!isset($schedule_id)) {
-    $start_year    = $end_year  = $year;
-    $start_month   = $end_month = $month;
-    $start_day     = $end_day   = $day;
-    $start_hour    = $end_hour  = $hour;
-    $start_min     = $end_min   = $min;
+    $start_year  = $year;
+    $start_month = $month;
+    $start_day   = $day;
+    $start_hour  = $hour;
+    $start_min   = $min;
+    $end_year    = $start_year;
+    $end_month   = $start_month;
+    $end_day     = $start_day;
+    $end_hour    = $start_hour;
+    $end_min     = $start_min;
 } else {
     $year      = $start_year;
     $month     = $start_month;

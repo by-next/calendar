@@ -21,76 +21,16 @@ if (!checkdate($month, $day, $year)) {
 }
 
 $schedule_id = $_GET['id'];
-/*
-if (isset($schedule_id)){
-    echo "00000000000";
-    session_unset();
-}
-*/
-echo @$_SESSION['post']['start_day'];
-echo $day;
+
 if(isset($_SESSION['post']['start_day']) && $_SESSION['post']['start_day'] != $day) {
     echo "uoooo</br>";
     //session_unset();
 }
 var_dump($_SESSION);
 
-// $db_connect = db_connect();
-
-// $schedule_id_in_sql =<<<EOD
-//     SELECT
-//          schedule_id
-//     FROM
-//          cal_schedule
-//     WHERE
-//          deleted_at IS NULL
-
-// EOD;
-
-// if ($result = mysqli_query($db_connect, $schedule_id_in_sql)) {
-//     while ($array_row= mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-//         $schedule_id_array[] = array('id' => $array_row['schedule_id']);
-//     }
-//     mysqli_free_result($result);
-// }
-// mysqli_close($db_connect);
-
-
-// $arr = array($schedule_id);
-
-// $arr2 = array($schedule_id_array);
-
-// var_dump($arr2);
-
-// var_dump(array_intersect($scheduleid, $arr2));
-
-// $db_connect = db_connect();
-
-// $schedule_id_in_sql =<<<EOD
-//     SELECT
-//          schedule_id
-//     FROM
-//          cal_schedule
-//     WHERE
-//          deleted_at IS NULL
-
-// EOD;
-
-// if ($result = mysqli_query($db_connect, $schedule_id_in_sql)) {
-//     while ($array_row= mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-//         $schedule_id_array[] = array('id' => $array_row['schedule_id']);
-//     }
-//     mysqli_free_result($result);
-// }
-// mysqli_close($db_connect);
-
-// var_dump($schedule_id_array);
-// var_dump($_SESSION['day']);
-// exit;
-// $aa = $_SESSION['day'];
-// var_dump($_SESSION);
 
 $db_connect = db_connect();
+
 //idがある場合の表示SQL
 $schedule_sql =<<<EOD
     SELECT
@@ -105,7 +45,7 @@ $schedule_sql =<<<EOD
          null
 EOD;
 
-// SQL実行後値を格納
+// 配列へ格納
 if ($result = mysqli_query($db_connect, $schedule_sql)) {
     while ($array_row= mysqli_fetch_array($result, MYSQLI_ASSOC)) {
         list($start_year, $start_month, $start_day, $start_hour, $start_min) = explode('-', date('Y-m-j-G-i',strtotime($array_row['start_time'])));

@@ -82,6 +82,7 @@ foreach ( $rss->channel->item as $key => $value) {
     $auc_link[$date]  = $link;
 }
 
+//DB接続
 $db_connect = db_connect();
 //スケジュール表示
 $schedule_sql =<<<EOD
@@ -96,7 +97,7 @@ $schedule_sql =<<<EOD
          null
 EOD;
 
-
+//スケジュールSQL実行代入
 if ($result = mysqli_query($db_connect, $schedule_sql)) {
     while ($array_row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
         list($start_year, $start_month, $start_day) = explode('-', date('Y-m-j',strtotime($array_row['start_time'])));
@@ -111,12 +112,10 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
             continue;
         }
 
-//一致した日に＋1日して予定吐き出し
+        //一致した日に＋1日して予定吐き出し
         $n_day   = $start_day;
         $n_month = $start_month;
         $n_year  = $start_year;
-
-        // for($i=1;strtotime($array_row['start_time'].'+'.$i.' day')<=strtotime($array_row['end_time']);$i++)
 
         while ($n_day != $end_s_day || $n_month != $end_s_month || $n_year != $end_s_year) {
             $ymd_day = date('Y-m-j',strtotime('tomorrow',strtotime($n_year.'-'.$n_month.'-'.$n_day)));
@@ -132,7 +131,7 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
 }
 mysqli_close($db_connect);
 
-// 可変年コンボボックス
+// 年可変用変数
 $start_combo_year = $year-5;
 $e_combo_year = $year+5;
 
@@ -149,7 +148,7 @@ $e_combo_year = $year+5;
 <body>
     <header id="header" class="">
         <h1>3ViewCalendar</h1>
-    </header><!-- /header -->
+    </header>
     <div class="cal_view">
         <div class="header_link">
             <a href="<?php echo '?year='.$prev['year'].'&month='.$prev['month'] ?>" class="button medium">先月</a>
@@ -213,23 +212,16 @@ $e_combo_year = $year+5;
                                 }
                                 ?>
                                 <td class="<?php echo $class ?>">
-                                    <!-- 日付出力 -->
                                     <a href="schedule.php?year=<?php echo $calendar['year']; ?>&month=<?php echo $calendar['month']; ?>&day=<?php echo $day; ?>"><?php echo $day;?></a>
-
-                                    <!-- 祝日 -->
                                     <?php if($holidays):?>
                                         <?php echo h($holidays[$date_str]); ?><br />
                                     <?php endif ?>
-
-                                    <!-- オクトピ -->
                                     <?php if(!empty($auc_topic[$date_str])):?>
                                         <a class="topic" href="<?php echo $auc_link[$date_str];?>" target="_blank" >
                                             <?php echo mb_strimwidth($auc_topic[$date_str], 0, 13,'…'); ?>
                                             <span><strong>トピック内容</strong><br /><?php echo h(mb_strimwidth($auc_topic[$date_str], 0, 50,'…')); ?></span>
                                         </a>
                                     <?php endif ?>
-
-                                    <!-- 予定 -->
                                     <?php $tmp = $schedules[$calendar['year']][$calendar['month']][$day];
                                     if(!empty($tmp)) foreach ($tmp as $schedule) : ?>
                                         <a class="tooltip" href="schedule.php?year=<?php echo $calendar['year']; ?>&month=<?php echo $calendar['month']; ?>&day=<?php echo $day; ?>&id=<?php echo $schedule['schedule_id'] ?>">
@@ -237,15 +229,10 @@ $e_combo_year = $year+5;
                                             <span><strong>スケジュール内容</strong><br /><?php echo h(mb_strimwidth($schedule['contents'], 0, 30,'…')); ?></span>
                                         </a>
                                     <?php endforeach ?>
-
                                 </td>
                             <?php $week++ ?>
-
-                                <!-- 土曜日 -->
                                 <?php if($week == 7): ?>
                                     </tr><tr>
-
-                                <!-- 日曜日 -->
                                 <?php $week=0; ?>
                                 <?php endif ?>
                             <?php endfor?>

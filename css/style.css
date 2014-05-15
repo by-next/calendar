@@ -6,6 +6,7 @@ body {
     font-size: 12px;
     line-height: 1.6;
     letter-spacing: 0;
+    background-color: rgba(0,0,0,0.02);
 }
 a{
     font-size: 13px;
@@ -34,6 +35,9 @@ a.topic:hover span{
     color: #666;
     font-size: 12px;
     line-height: 1.5em;
+}
+.error{
+    color: red;
 }
 /*曜日*/
 .sun{
@@ -68,6 +72,7 @@ a.topic:hover span{
 /*メイン*/
 .box{
     background-color: #fff;
+    margin-bottom: 20px;
 }
 .topic{
     font-size: 14px;
@@ -84,14 +89,17 @@ table.cal {
     background-color: #fff;
     border-width: thin;
     border-spacing: 0px;
-    border-style: outset;
-    border-color: gray;
+    border-style: inset;
+    border-color: rgba(0,0,0,0.1);
     border-collapse: collapse;
     text-align: center;
     float: left;
     margin-left: 25px;
+    margin-bottom: 30px;
+    width: 30%;
 }
 table.cal th {
+    white-space: nowrap;
     table-layout: auto;
     font-size: 16px;
     line-height: 1.6em;
@@ -99,7 +107,7 @@ table.cal th {
     border-width: 1px;
     padding: 5px;
     border-style: inset;
-    border-color: gray;
+    border-color: rgba(0,0,0,0.1);
     background-color: rgba(0,0,255,0.1);
     width: 100px;
     height: 60px;
@@ -109,11 +117,11 @@ table.cal th {
     text-align:left;
     vertical-align: top;
     font-size: 12px;
-    line-height: 1.5em;
+    line-height: 1.6em;
     border-width: 1px;
     padding: 5px;
     border-style: inset;
-    border-color: gray;
+    border-color: rgba(0,0,0,0.1);
     width: 100px;
     height: 80px;
         -moz-border-radius: ;
@@ -146,7 +154,9 @@ a.tooltip:hover span{
     font-size: 12px;
     line-height: 1.5em;
 }
-
+#schedule_title{
+    width: 50%;
+}
 /*schedule.php*/
 input.submit_button{
     font-size: 1.2em;
@@ -159,7 +169,7 @@ input.submit_insert{
     font-size: 1.2em;
     width: 100px;
     height: 60px;
-    padding: 20px 50px;
+    padding: 5px
 }
 input#submit_delete{   
     font-size: 1.2em;
@@ -171,6 +181,84 @@ input#submit_delete{
 input.input_ymd{
     width: 30px;
 }
+.regist_update{
+    width: 35%;
+}
 .delete{
-    float: right;
+    margin: 0;
+}
+.submit_btn{
+    border:solid 1px rgba(0,0,0,0.1);
+    background-color: rgba(0,0,0,0.03);
+    margin:5px;
+    font-family:'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック','MS PGothic',sans-serif;
+    font-size:1.2em;
+    text-transform:uppercase;
+    font-weight:lighter;
+    color:rgba(0,0,0,0.8);
+    cursor:pointer;
+}
+table.schedule_table{
+    font-size: 14px;
+    background-color: #fff;
+    border-width: thin;
+    border-spacing: 0px;
+    border-style: inset;
+    border-color: rgba(0,0,0,0.1);
+    border-collapse: collapse;
+    text-align: center;
+    float: left;
+    margin-left: 25px;
+    margin-bottom: 10px;
+}
+table.schedule_table th {
+    table-layout: auto;
+    font-size: 14px;
+    line-height: 2.2em;
+    font-weight: lighter;
+    border-width: 1px;
+    padding: 5px;
+    border-style: inset;
+    border-color: rgba(0,0,0,0.1);
+    background-color: rgba(0,0,255,0.1);
+    width: 100px;
+    height: 30px;
+        -moz-border-radius: ;
+}
+.schedule_table td {
+    text-align:left;
+    vertical-align: top;
+    font-size: 14px;
+    line-height: 2.2em;
+    border-width: 1px;
+    padding: 5px;
+    border-style: inset;
+    border-color: rgba(0,0,0,0.1);
+    width: 100px;
+    height: 30px;
+        -moz-border-radius: ;
+}
+.submit_btn_back{
+    border:solid 1px rgba(0,0,0,0.1);
+    background-color: rgba(0,0,0,0.03);
+    font-size:1.4em;
+    text-transform:uppercase;
+    font-weight:lighter;
+    color:rgba(0,0,0,0.8);
+    margin: 5px;
+}
+.submit_time{
+    border:solid 1px rgba(0,0,255,0.1);
+    background-color: rgba(0,0,255,0.01);
+    font-size:0.8em;
+    font-weight:lighter;
+    color:rgba(0,0,0,0.8);
+}
+.submit_text{
+    border:solid 1px rgba(0,0,0,0.1);
+    background-color: rgba(0,0,0,0.03);
+    font-size:0.8em;
+    font-weight:lighter;
+    color:rgba(0,0,0,0.8);
+    width: 400px;
 }

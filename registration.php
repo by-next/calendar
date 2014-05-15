@@ -17,7 +17,7 @@ $_SESSION['month'] = $month;
 $_SESSION['day']   = $day;
 
 // $_SESSION['year']['month']['day'] = $_SESSION['post']['schedule_title'];
-$date = $_SESSION['year'].$_SESSION['month'].$_SESSION['day'];
+// $date = $_SESSION['year'].$_SESSION['month'].$_SESSION['day'];
 
 // var_dump($date);
 // exit;
@@ -26,35 +26,35 @@ $date = $_SESSION['year'].$_SESSION['month'].$_SESSION['day'];
 $start_time = $_SESSION['post']['start_year'].'-'.$_SESSION['post']['start_month'].'-'.$_SESSION['post']['start_day'].' '.$_SESSION['post']['start_hour'].':'.$_SESSION['post']['start_min'].':00';
 $end_time   = $_SESSION['post']['end_year'].'-'.$_SESSION['post']['end_month'].'-'.$_SESSION['post']['end_day'].' '.$_SESSION['post']['end_hour'].':'.$_SESSION['post']['end_min'].':00';
 
-$start_year  = $_SESSION['post']['start_year'];
-$start_month = $_SESSION['post']['start_month'];
-$start_day   = $_SESSION['post']['start_day'];
-$start_hour  = $_SESSION['post']['start_hour'];
-$start_min   = $_SESSION['post']['start_min'];
+// $start_year  = $_SESSION['post']['start_year'];
+// $start_month = $_SESSION['post']['start_month'];
+// $start_day   = $_SESSION['post']['start_day'];
+// $start_hour  = $_SESSION['post']['start_hour'];
+// $start_min   = $_SESSION['post']['start_min'];
 
-$end_year    = $_SESSION['post']['end_year'];
-$end_month   = $_SESSION['post']['end_month'];
-$end_day     = $_SESSION['post']['end_day'];  
-$end_hour    = $_SESSION['post']['end_hour'];
-$end_min     = $_SESSION['post']['end_min'];  
+// $end_year    = $_SESSION['post']['end_year'];
+// $end_month   = $_SESSION['post']['end_month'];
+// $end_day     = $_SESSION['post']['end_day'];  
+// $end_hour    = $_SESSION['post']['end_hour'];
+// $end_min     = $_SESSION['post']['end_min'];  
 
-if (!checkdate($start_month, $start_day, $start_year)) {
-    $timestamp = time();
-    $start_year  = strtotime(date('Y', $timestamp));
-    $start_month = date('m', $timestamp);
-    $start_day   = date('d', $timestamp);
-} else {
-    $timestamp = strtotime($start_year.$start_month.$start_day);
-}
+// if (!checkdate($start_month, $start_day, $start_year)) {
+//     $timestamp = time();
+//     $start_year  = strtotime(date('Y', $timestamp));
+//     $start_month = date('m', $timestamp);
+//     $start_day   = date('d', $timestamp);
+// } else {
+//     $timestamp = strtotime($start_year.$start_month.$start_day);
+// }
 
-if (!checkdate($end_month, $end_day, $end_year)) {
-    $timestamp = time();
-    $end_year  = date('Y', $timestamp);
-    $end_month = date('m', $timestamp);
-    $end_day   = date('d', $timestamp);
-} else {
-    $timestamp = strtotime($end_year.$end_month.$end_day);
-}
+// if (!checkdate($end_month, $end_day, $end_year)) {
+//     $timestamp = time();
+//     $end_year  = date('Y', $timestamp);
+//     $end_month = date('m', $timestamp);
+//     $end_day   = date('d', $timestamp);
+// } else {
+//     $timestamp = strtotime($end_year.$end_month.$end_day);
+// }
 
 // $start_time = $start_year.$start_month.$start_day;
 // $end_time   = $end_year.$end_month.$end_day;

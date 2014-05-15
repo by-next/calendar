@@ -11,14 +11,6 @@ if(isset($_GET['year']) && $_GET['year'] != '' && isset($_GET['month']) && $_GET
     $month = date('m');
 }
 
-
-
-
-
-
-
-
-
 $today   = date('Y-m-d');// 本日取得
 
 $month_date       = date('t', mktime(0, 0, 0, $month, 1, $year));// 月の日数表示(4月なら30日分)
@@ -138,7 +130,7 @@ mysqli_close($db_connect);
 
 // 年可変用変数
 $start_combo_year = $year-5;
-$e_combo_year = $year+5;
+$end_combo_year = $year+5;
 
 ?>
 
@@ -161,7 +153,7 @@ $e_combo_year = $year+5;
             <a href="<?php echo '?year='.$next['year'].'&month='.$next['month'] ?>" class="button medium">次月</a>
             <form method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
                 <select class="submit_btn" name="year">
-                    <?php for ($i=$start_combo_year; $i <= $e_combo_year; $i++) : ?>
+                    <?php for ($i=$start_combo_year; $i <= $end_combo_year; $i++) : ?>
                         <option value="<?php echo $i ?>"<?php if($i == $year) echo 'selected' ?>><?php echo $i ?></option>
                     <?php endfor ?>
                 </select>年

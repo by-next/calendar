@@ -4,12 +4,13 @@ session_start();
 
 require_once('file_load.php');
 
-// 日にち取得
+//日とID取得
 $year  = $_GET['year'];
 $month = $_GET['month'];
 $day   = $_GET['day'];
 $hour  = date('G');
 $min   = date('i');
+$schedule_id = $_GET['id'];
 
 if (!checkdate($month, $day, $year)) {
     $timestamp = time();
@@ -20,13 +21,12 @@ if (!checkdate($month, $day, $year)) {
     $timestamp = strtotime($year.$month.$day);
 }
 
-$schedule_id = $_GET['id'];
-
-if(isset($_SESSION['post']['start_day']) && $_SESSION['post']['start_day'] != $day) {
-    echo "uoooo</br>";
-    //session_unset();
+//session年月日とGET年月日が一致しない場合はセッション削除かつidがある場合も削除
+if((isset($_SESSION['day']) && $_SESSION['day'] != $day) || (isset($_SESSION['year']) && $_SESSION['year'] != $year) || (isset($_SESSION['month']) && $_SESSION['month'] != $month) || (isset($schedule_id))) {
+    session_unset();
 }
 
+//DB接続
 $db_connect = db_connect();
 
 //idがある場合の表示SQL
@@ -83,7 +83,7 @@ $schedule = $schedules[$start_year][$start_month][$start_day];
 
 //コンボボックス年前後5年表示
 $start_combo_year = $year-5;
-$e_combo_year = $year+5;
+$end_combo_year   = $year+5;
 //1月〜12月
 $month_min = 1;
 $month_max = 12;
@@ -112,13 +112,8 @@ if (!isset($_SESSION['post'])) {
     $end_time   = $_SESSION['post']['end_year'].'-'.$_SESSION['post']['end_month'].'-'.$_SESSION['post']['end_day'].' '.$_SESSION['post']['end_hour'].':'.$_SESSION['post']['end_min'].':00';
     $schedule_title = $_SESSION['post']['schedule_title'];
     $schedule_contents = $_SESSION['post']['schedule_contents'];
-    //$title_validate = $_SESSION['error']['title_error'];    
+}
 
-    //session_unset();
-}
-if(!empty($_COOKIE['title_cookie'])) {
-    $schedule_title = $_COOKIE['title_cookie'];
-}
 ?>
 
 <!DOCTYPE html>
@@ -144,7 +139,7 @@ if(!empty($_COOKIE['title_cookie'])) {
                     <td>
                         開始日
                         <select name="start_year" class="submit_time">
-                            <?php for ($i=$start_combo_year; $i <= $e_combo_year; $i++) : ?>
+                            <?php for ($i=$start_combo_year; $i <= $end_combo_year; $i++) : ?>
                                 <option value="<?php echo $i ?>"<?php if($i == $start_year) echo 'selected' ?>><?php echo $i ?></option>
                             <?php endfor ?>
                         </select>年
@@ -170,7 +165,7 @@ if(!empty($_COOKIE['title_cookie'])) {
                     <td><?php if(isset($_SESSION['error']['time_error'])) echo $_SESSION['error']['time_error']; ?><br />
                         終了日
                         <select name="end_year" class="submit_time">
-                            <?php for ($i=$start_combo_year; $i <= $e_combo_year; $i++) : ?>
+                            <?php for ($i=$start_combo_year; $i <= $end_combo_year; $i++) : ?>
                                 <option value="<?php echo $i ?>"<?php if($i == $end_year) echo 'selected' ?>><?php echo $i ?></option>
                             <?php endfor ?>
                         </select>年
@@ -196,7 +191,7 @@ if(!empty($_COOKIE['title_cookie'])) {
                     <td>タイトル</td>
                 </tr>
                 <tr>
-                    <td><?php if(isset($title_validate)) echo $title_validate; ?><br /><input type="text" class="submit_text" name="schedule_title" value="<?php echo h($schedule_title);?>" /></td>
+                    <td><?php if(isset($_SESSION['error']['title_error'])) echo $_SESSION['error']['title_error']; ?><br /><input type="text" class="submit_text" name="schedule_title" value="<?php echo h($schedule_title);?>" /></td>
                 </tr>
                 <tr>
                     <td>スケジュール内容</td>

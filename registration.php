@@ -84,7 +84,6 @@ if (strlen($schedule_contents) == 0){
 $_SESSION['error'] = $msg;
 
 if (!empty($_SESSION['error']) ){
-    setcookie('title_cookie',$schedule_title);
     return header("location: http://kensyu.aucfan.com/schedule.php?year=$year&month=$month&day=$day");    
 }
 

@@ -1,12 +1,17 @@
 @charset "UTF-8";
-
 /*css*/
-body {
+*{
+    margin: 0px;
+    padding: 0px;
+}
+html,body{
     font-family:'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック','MS PGothic',sans-serif;
     font-size: 12px;
     line-height: 1.6;
     letter-spacing: 0;
     background-color: rgba(0,0,0,0.02);
+    width: 100%;
+    height: 100%;
 }
 a{
     font-size: 13px;
@@ -61,7 +66,7 @@ a.topic:hover span{
     width: 100%;
     margin: 0 auto;
     text-align: center;
-    color : rgba(100,200,0,1);
+    color : rgba(100,200,0,0.7);
 }
 .header_link{
     width: 100%;
@@ -70,9 +75,15 @@ a.topic:hover span{
     text-align: center;
 }
 /*メイン*/
-.box{
+.main_box{
     background-color: #fff;
-    margin-bottom: 20px;
+    margin: 0 auto;
+    display: table;
+    width: 100%;
+}
+.view_row{
+    display: table-cell;
+    padding: 10px;
 }
 .topic{
     font-size: 14px;
@@ -87,16 +98,13 @@ table.cal {
     max-height: 600px;
     font-size: 18px;
     background-color: #fff;
-    border-width: thin;
+    border-width: 0px;
     border-spacing: 0px;
     border-style: inset;
     border-color: rgba(0,0,0,0.1);
     border-collapse: collapse;
     text-align: center;
-    float: left;
-    margin-left: 25px;
-    margin-bottom: 30px;
-    width: 30%;
+    display: felx;
 }
 table.cal th {
     white-space: nowrap;
@@ -109,22 +117,20 @@ table.cal th {
     border-style: inset;
     border-color: rgba(0,0,0,0.1);
     background-color: rgba(0,0,255,0.1);
-    width: 100px;
+    width: 110px;
     height: 60px;
-        -moz-border-radius: ;
 }
 .cal td {
     text-align:left;
     vertical-align: top;
-    font-size: 12px;
+    font-size: 10px;
     line-height: 1.6em;
     border-width: 1px;
-    padding: 5px;
+    padding: 2px;
     border-style: inset;
     border-color: rgba(0,0,0,0.1);
-    width: 100px;
-    height: 80px;
-        -moz-border-radius: ;
+    width: 110px;
+    height: 60px;
 }
 .cal td:hover{
     background: rgba(255,255,0,0.1);
@@ -191,7 +197,6 @@ input.input_ymd{
     border:solid 1px rgba(0,0,0,0.1);
     background-color: rgba(0,0,0,0.03);
     margin:5px;
-    font-family:'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック','MS PGothic',sans-serif;
     font-size:1.2em;
     text-transform:uppercase;
     font-weight:lighter;
@@ -262,3 +267,38 @@ table.schedule_table th {
     color:rgba(0,0,0,0.8);
     width: 400px;
 }
+#modal_wrap{
+    position: absolute;
+    width: 470px;
+    height: 550px;
+    background-color: rgba(255,255,255,1);
+    top:15%;
+    left:50%;
+    margin: -40px 0 0 -235px;
+    padding: 5px;
+}
+#modal_bk{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    top:0px;
+}
+#modal_close_button{
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border:1px solid #555;
+    text-align: center;
+    line-height: 18px;
+    position: absolute;
+    top:-8px;
+    right: -8px;
+    cursor: pointer;
+    background-color: rgba(255,255,255,1);
+}
+/*
+#res p{
+    margin: 4px 0;
+}
+*/

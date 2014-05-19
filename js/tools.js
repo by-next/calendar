@@ -132,40 +132,61 @@ $(document).on('click','#regist',function(e){
     //タイトルと内容
     var title    = $('.submit_text').eq(0).val();
     var contents = $('.submit_text').eq(1).val();
-    //ajaxで内容を格納
-    $.ajax({
-        url: 'registration.php',
-        data:{
-        //データ代入
-        start_year : start_time_year,
-        start_month: start_time_month,
-        start_day  : start_time_day,
-        start_hour : start_time_hour,
-        start_min  : start_time_min,
+    //開始と終了時間を変数へ代入
+    var start_time = new Date(start_time_year,start_time_month-1,start_time_day,start_time_hour,start_time_min,00,000);
+    var end_time   = new Date(end_time_year,end_time_month-1,end_time_day,end_time_hour,end_time_min,00,000);
+    var is_error = false;
 
-        end_year : end_time_year,
-        end_month: end_time_month,
-        end_day  : end_time_day,
-        end_hour : end_time_hour,
-        end_min  : end_time_min,
+    $('.error').empty();
+    //バリデーション処理
+    if(start_time.getTime() > end_time.getTime()){
+        $('.error').append('*時間がさかのぼっています。選択しなおしてください。<br />');
+        is_error = true;
+    }
+    if(title.length === 0){
+        $('.error').append('*タイトルが入力されていません。入力しなおしてください。<br />');
+        is_error = true;
+    }
+    if(contents.length === 0){
+        $('.error').append('*内容が入力されていません。入力しなおしてください。<br />');
+        is_error = true;
+    }
+    if (!is_error) {
+        //ajaxで内容を格納
+        $.ajax({
+            url: 'registration.php',
+            data:{
+            //データ代入
+            start_year : start_time_year,
+            start_month: start_time_month,
+            start_day  : start_time_day,
+            start_hour : start_time_hour,
+            start_min  : start_time_min,
 
-        schedule_title : title,
-        schedule_contents : contents
-    },
-    type:'post'
-    }).then(function(data,status){
-        // 成功時
-        console.log(status);
-        console.log(data);
-        if(status === 'success'){
-            view_calendar();
-        } else {
-            $('#error_msg').append(data);
-        }
-    },function(data,status){
-        // 失敗時
-        console.log(status);
-    });
+            end_year : end_time_year,
+            end_month: end_time_month,
+            end_day  : end_time_day,
+            end_hour : end_time_hour,
+            end_min  : end_time_min,
+
+            schedule_title : title,
+            schedule_contents : contents
+        },
+        type:'post'
+        }).then(function(data,status){
+            // 成功時
+            console.log(status);
+            console.log(data);
+            if(status === 'success'){
+                view_calendar();
+            } else {
+                $('#error_msg').append(data);
+            }
+        },function(data,status){
+            // 失敗時
+            console.log(status);
+        });
+    }
 });
 
 //スケジュール削除処理
@@ -237,37 +258,58 @@ $(document).on('click','#update',function(e){
     var title    = $('.submit_text').eq(0).val();
     var contents = $('.submit_text').eq(1).val();
     var id = $('#schedule_num').val();
-    $.ajax({
-        url: 'registration.php',
-        data:{
-            //データを代入
-            start_year : start_time_year,
-            start_month: start_time_month,
-            start_day  : start_time_day,
-            start_hour : start_time_hour,
-            start_min  : start_time_min,
+    //開始と終了時間を変数へ代入
+    var start_time = new Date(start_time_year,start_time_month-1,start_time_day,start_time_hour,start_time_min,00,000);
+    var end_time   = new Date(end_time_year,end_time_month-1,end_time_day,end_time_hour,end_time_min,00,000);
+    var is_error = false;
 
-            end_year : end_time_year,
-            end_month: end_time_month,
-            end_day  : end_time_day,
-            end_hour : end_time_hour,
-            end_min  : end_time_min,
+    $('.error').empty();
+    //バリデーション処理
+    if(start_time.getTime() > end_time.getTime()){
+        $('.error').append('*時間がさかのぼっています。選択しなおしてください。<br />');
+        is_error = true;
+    }
+    if(title.length === 0){
+        $('.error').append('*タイトルが入力されていません。入力しなおしてください。<br />');
+        is_error = true;
+    }
+    if(contents.length === 0){
+        $('.error').append('*内容が入力されていません。入力しなおしてください。<br />');
+        is_error = true;
+    }
+    if (!is_error) {
+        $.ajax({
+            url: 'registration.php',
+            data:{
+                //データを代入
+                start_year : start_time_year,
+                start_month: start_time_month,
+                start_day  : start_time_day,
+                start_hour : start_time_hour,
+                start_min  : start_time_min,
 
-            schedule_title : title,
-            schedule_contents : contents,
-            schedule_id : id
-        },
-        type:'post'
-    }).then(function(data,status){
-        // 成功時
-        console.log(status);
-        if(status === 'success'){
-            view_calendar();
-        } else {
-            $('#error_msg').append(data);
-        }
-    },function(data,status){
-        // 失敗時
-        console.log(status);
-    });
+                end_year : end_time_year,
+                end_month: end_time_month,
+                end_day  : end_time_day,
+                end_hour : end_time_hour,
+                end_min  : end_time_min,
+
+                schedule_title : title,
+                schedule_contents : contents,
+                schedule_id : id
+            },
+            type:'post'
+        }).then(function(data,status){
+            // 成功時
+            console.log(status);
+            if(status === 'success'){
+                view_calendar();
+            } else {
+                $('#error_msg').append(data);
+            }
+        },function(data,status){
+            // 失敗時
+            console.log(status);
+        });
+    }
 });

@@ -175,7 +175,6 @@ $end_combo_year = $year+5;
                         <?php for($i=1; $i<=$calendar['month_begin_cell']; $i++):?>
                             <td></td>
                         <?php endfor ?>
-
                         <?php $week=$calendar['month_begin_cell'];
                         for($day = 1; $day <= $calendar['month_date']; $day++):
                             $date_str = $calendar['year'].'-'.$calendar['month'].'-'.sprintf('%02d',$day);

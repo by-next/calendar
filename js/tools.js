@@ -1,6 +1,5 @@
 //ajaxを使用して再読み込みをして表示させる
 function view_calendar(){
-    // $('boby').append(data);
     $('body').children().remove();
     $.ajax({
         url: 'calendar.php',
@@ -8,7 +7,6 @@ function view_calendar(){
     }).then(function(data,status){
         // 成功時
         console.log(status);
-        // console.log(data);
         $('body').append(data);
     },function(data,status){
         // 失敗時
@@ -18,9 +16,6 @@ function view_calendar(){
 
 //先月次月遷移処理
 function move_calendar(year,month){
-    // console.log(year);
-    // console.log(month);
-    // $('boby').append(data);
     $('body').children().remove();
     $.ajax({
         url: 'calendar.php',
@@ -32,7 +27,6 @@ function move_calendar(year,month){
     }).then(function(data,status){
         // 成功時
         console.log(status);
-        //console.log(data);
         $('body').append(data);
     },function(data,status){
         // 失敗時
@@ -65,7 +59,6 @@ $(function(){
 $(document).on('click','#view_output',function(e){
     var move_year  = $('.move_ym').eq(0).val();
     var move_month = $('.move_ym').eq(1).val();
-    // console.log(move_year+move_month);
     move_calendar(move_year,move_month);
 });
 
@@ -98,8 +91,6 @@ $(document).on('click','.calendar_days',function(e){
         type:'post'
     }).then(function(data,status){
         // 成功時
-        // console.log(status);
-        // console.log(data);
         //モーダルの中身
         var modal_html = '<div id="modal_wrap">' + '<div id="modal_close_button">X</div>' + data + '</div>';
         // main_boxの下にモーダル生成
@@ -124,7 +115,6 @@ $(document).on('click','#modal_close_button',function(e){
     $('#modal_bk').remove();
 });
 
-
 //スケジュール登録処理
 $(document).on('click','#regist',function(e){
     //開始時間
@@ -142,7 +132,6 @@ $(document).on('click','#regist',function(e){
     //タイトルと内容
     var title    = $('.submit_text').eq(0).val();
     var contents = $('.submit_text').eq(1).val();
-    // console.log(title+contents);
     //ajaxで内容を格納
     $.ajax({
         url: 'registration.php',
@@ -197,7 +186,6 @@ $(document).on('click','#delete',function(e){
     var title    = $('.submit_text').eq(0).val();
     var contents = $('.submit_text').eq(1).val();
     var id = $('#schedule_num').val();
-    // console.log(title+contents);
     $.ajax({
         url: 'registration.php',
         data:{
@@ -222,8 +210,6 @@ $(document).on('click','#delete',function(e){
         type:'post'
     }).then(function(data,status){
         // 成功時
-        // console.log(status);
-        // console.log(data);
         if(status === 'success'){
             view_calendar();
         }
@@ -231,7 +217,6 @@ $(document).on('click','#delete',function(e){
         // 失敗時
         console.log(status);
     });
-    //alert('削除');
 });
 
 //スケジュール更新処理
@@ -252,7 +237,6 @@ $(document).on('click','#update',function(e){
     var title    = $('.submit_text').eq(0).val();
     var contents = $('.submit_text').eq(1).val();
     var id = $('#schedule_num').val();
-    //console.log(id);
     $.ajax({
         url: 'registration.php',
         data:{
@@ -286,5 +270,4 @@ $(document).on('click','#update',function(e){
         // 失敗時
         console.log(status);
     });
-    //alert('アップデート');
 });

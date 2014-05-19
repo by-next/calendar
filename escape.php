@@ -15,5 +15,4 @@ function optionLoop($start, $end, $value = null){
     }
     return $i;
 }
-
 ?>

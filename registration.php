@@ -49,7 +49,7 @@ if (strlen($schedule_contents) == 0){
     $msg['contents_error'] = '＊内容が入力されていません。入力しなおしてください。';
 }
 
-// $_SESSION['error'] = $msg;
+//入力漏れがあればエラー表示
 if($msg != ''){
     echo $msg['time_error'].'<br />';
     echo $msg['title_error'].'<br />';
@@ -57,16 +57,11 @@ if($msg != ''){
     exit;
 }
 
-// if (!empty($_SESSION['error']) ){
-//     return header("location:schedule.php?year=$year&month=$month&day=$day");    
-// }
-
 //DB接続
 $db_connect = db_connect();
 
-// $schedule_title    = mysqli_real_escape_string($db_connect,$schedule_title);
-// $schedule_contents = mysqli_real_escape_string($db_connect,$schedule_contents);
-
+$schedule_title    = mysqli_real_escape_string($db_connect,$schedule_title);
+$schedule_contents = mysqli_real_escape_string($db_connect,$schedule_contents);
 
 //SQL処理開始
 if (empty($id) && !is_null($schedule_title)){
@@ -113,11 +108,8 @@ EOD;
 
 }
 //SQL実行
-//mysqli_real_escape_string($sql);
 if (isset($start_time) && !empty($sql)){
     $sql_result = mysqli_query($db_connect, $sql);
 }
 session_unset();
-// return header("location: http://kensyu.aucfan.com/?year=".$year."&month=".$month);
-// echo '成功！';
 ?>

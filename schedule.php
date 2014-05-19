@@ -45,7 +45,6 @@ EOD;
 // 配列へ格納
 if ($result = mysqli_query($db_connect, $schedule_sql)) {
     while ($array_row= mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-//ここにあるかないかの判定を入れれば下の代入処理はいらなくなるはず
         list($start_year, $start_month, $start_day, $start_hour, $start_min) = explode('-', date('Y-m-j-G-i',strtotime($array_row['start_time'])));
         list($end_s_year, $end_s_month, $end_s_day,$end_s_hour,$end_s_min) = explode('-', date('Y-m-j-G-i',strtotime($array_row['end_time'])));
         $schedules[$start_year][$start_month][$start_day] = array(

@@ -168,7 +168,7 @@ $(document).on('click','#regist',function(e){
         // 成功時
         console.log(status);
         console.log(data);
-        if(data == '成功！'){
+        if(status === 'success'){
             view_calendar();
         } else {
             $('#error_msg').append(data);
@@ -224,9 +224,8 @@ $(document).on('click','#delete',function(e){
         // 成功時
         // console.log(status);
         // console.log(data);
-        if(data == '成功'){
+        if(status === 'success'){
             view_calendar();
-
         }
     },function(data,status){
         // 失敗時

@@ -5,12 +5,12 @@ session_start();
 require_once('file_load.php');
 
 //日とID取得
-$year  = $_GET['year'];
-$month = $_GET['month'];
-$day   = $_GET['day'];
+$year  = $_POST['year'];
+$month = $_POST['month'];
+$day   = $_POST['day'];
 $hour  = date('G');
 $min   = date('i');
-$schedule_id = $_GET['id'];
+$schedule_id = $_POST['id'];
 
 if (!checkdate($month, $day, $year)) {
     $timestamp = time();
@@ -20,9 +20,8 @@ if (!checkdate($month, $day, $year)) {
 } else {
     $timestamp = strtotime($year.$month.$day);
 }
-
 //session年月日とGET年月日が一致しない場合はセッション削除かつidがある場合も削除
-if((isset($_SESSION['day']) && $_SESSION['day'] != $day) || (isset($_SESSION['year']) && $_SESSION['year'] != $year) || (isset($_SESSION['month']) && $_SESSION['month'] != $month) || (isset($schedule_id))) {
+if((isset($_SESSION['year']) && $_SESSION['year'] != $year) || (isset($_SESSION['month']) && $_SESSION['month'] != $month) || (isset($_SESSION['day']) && $_SESSION['day'] != $day) || (isset($schedule_id))) {
     session_unset();
 }
 
@@ -46,6 +45,7 @@ EOD;
 // 配列へ格納
 if ($result = mysqli_query($db_connect, $schedule_sql)) {
     while ($array_row= mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+//ここにあるかないかの判定を入れれば下の代入処理はいらなくなるはず
         list($start_year, $start_month, $start_day, $start_hour, $start_min) = explode('-', date('Y-m-j-G-i',strtotime($array_row['start_time'])));
         list($end_s_year, $end_s_month, $end_s_day,$end_s_hour,$end_s_min) = explode('-', date('Y-m-j-G-i',strtotime($array_row['end_time'])));
         $schedules[$start_year][$start_month][$start_day] = array(
@@ -58,7 +58,8 @@ if ($result = mysqli_query($db_connect, $schedule_sql)) {
 }
 mysqli_close($db_connect);
 
-if (!isset($schedule_id)) {
+//idまたははじめの年がなければ当日の年月日を代入
+if (!isset($schedule_id) || empty($start_year)) {
     $start_year  = $year;
     $start_month = $month;
     $start_day   = $day;
@@ -70,16 +71,16 @@ if (!isset($schedule_id)) {
     $end_hour    = $start_hour;
     $end_min     = $start_min;
 } else {
-    $year      = $start_year;
-    $month     = $start_month;
-    $day       = $start_day;
-    $hour      = $start_hour;
-    $min       = $start_min;
-    $end_year  = $end_s_year;
-    $end_month = $end_s_month;
-    $end_day   = $end_s_day;
-    $end_hour  = $end_s_hour;
-    $end_min   = $end_s_min;
+    $year        = $start_year;
+    $month       = $start_month;
+    $day         = $start_day;
+    $hour        = $start_hour;
+    $min         = $start_min;
+    $end_year    = $end_s_year;
+    $end_month   = $end_s_month;
+    $end_day     = $end_s_day;
+    $end_hour    = $end_s_hour;
+    $end_min     = $end_s_min;
 }
 
 //スケジュールid,title,contents取得配列
@@ -88,22 +89,8 @@ $schedule = $schedules[$start_year][$start_month][$start_day];
 //コンボボックス年前後5年表示
 $start_combo_year = $year-5;
 $end_combo_year   = $year+5;
-//1月〜12月
-$month_min = 1;
-$month_max = 12;
-//1日〜31日
-$day_min = 1;
-$day_max = 31;
 
-function optionLoop($start, $end, $value = null){
-    for($i = $start; $i <= $end; $i++){
-        if(isset($value) &&  $value == $i){
-            echo '<option value="'.$i.'" selected="selected">'.$i.'</option>';
-        }else{
-            echo '<option value="'.$i.'">'.$i.'</option>';
-        }
-    }
-}
+optionLoop($start, $end, $value = null);
 
 //バリデーションの表示切り替えタイミング
 if (!isset($_SESSION['post'])) {
@@ -112,10 +99,19 @@ if (!isset($_SESSION['post'])) {
     $schedule_contents = $schedule['contents'];
 } else {
     // リダイレクトで来た時
-    $start_time = $_SESSION['post']['start_year'].'-'.$_SESSION['post']['start_month'].'-'.$_SESSION['post']['start_day'].' '.$_SESSION['post']['start_hour'].':'.$_SESSION['post']['start_min'].':00';
-    $end_time   = $_SESSION['post']['end_year'].'-'.$_SESSION['post']['end_month'].'-'.$_SESSION['post']['end_day'].' '.$_SESSION['post']['end_hour'].':'.$_SESSION['post']['end_min'].':00';
+    $start_time = $_SESSION['post']['start_year'].'-'.
+                  $_SESSION['post']['start_month'].'-'.
+                  $_SESSION['post']['start_day'].' '.
+                  $_SESSION['post']['start_hour'].':'.
+                  $_SESSION['post']['start_min'].':00';
+    $end_time   = $_SESSION['post']['end_year'].'-'.
+                  $_SESSION['post']['end_month'].'-'.
+                  $_SESSION['post']['end_day'].' '.
+                  $_SESSION['post']['end_hour'].':'.
+                  $_SESSION['post']['end_min'].':00';
     $schedule_title = $_SESSION['post']['schedule_title'];
     $schedule_contents = $_SESSION['post']['schedule_contents'];
+    $schedule_id = $_SESSION['post']['schedule_id'];
 }
 
 ?>
@@ -128,7 +124,6 @@ if (!isset($_SESSION['post'])) {
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-    <h1>スケジュール</h1>
     <div class="wrapper">
         <table class="schedule_table">
             <caption>スケジュール編集</caption>
@@ -138,7 +133,7 @@ if (!isset($_SESSION['post'])) {
                 </tr>
             </thead>
             <tbody>
-                <form method="post" action="registration.php?year=<?php echo $year ?>&month=<?php echo $month ?>&day=<?php echo $day ?>">
+                <form id="schedule" method="post" action="registration.php?year=<?php echo $year ?>&month=<?php echo $month ?>&day=<?php echo $day ?>">
                 <tr>
                     <td>
                         開始日
@@ -148,13 +143,17 @@ if (!isset($_SESSION['post'])) {
                             <?php endfor ?>
                         </select>年
                         <select name="start_month" class="submit_time" value="<?php echo $month;?>">
-                            <?php optionLoop($month_min,$month_max,$start_month);?>
+                            <?php for ($i=1; $i <= 12; $i++) : ?>
+                                <option value="<?php echo $i ?>"<?php if($i == $start_month) echo 'selected' ?>><?php echo $i ?></option>
+                            <?php endfor ?>
                         </select>月
                         <select name="start_day" class="submit_time" value="<?php echo $day;?>">
-                            <?php optionLoop($day_min,$day_max,$start_day);?>
+                            <?php for ($i=1; $i <= 31; $i++) : ?>
+                                <option value="<?php echo $i ?>"<?php if($i == $start_day) echo 'selected' ?>><?php echo $i ?></option>
+                            <?php endfor ?>
                         </select>日
                         <select name="start_hour" class="submit_time">
-                            <?php for ($i=1; $i<24; $i++):?>
+                            <?php for ($i=1; $i<=24; $i++):?>
                             <option name="start_hour" value="<?php echo $i;?>"<?php if ($i == $start_hour):?>selected<?php endif;?>><?php echo $i ?></option>
                             <?php endfor; ?>
                         </select>時
@@ -166,7 +165,7 @@ if (!isset($_SESSION['post'])) {
                     </td>  
                 </tr>
                 <tr>
-                    <td><?php if(isset($_SESSION['error']['time_error'])) echo $_SESSION['error']['time_error']; ?><br />
+                    <td>
                         終了日
                         <select name="end_year" class="submit_time">
                             <?php for ($i=$start_combo_year; $i <= $end_combo_year; $i++) : ?>
@@ -174,13 +173,17 @@ if (!isset($_SESSION['post'])) {
                             <?php endfor ?>
                         </select>年
                         <select name="end_month" class="submit_time" value="<?php echo $end_month;?>">
-                            <?php optionLoop($month_min,$month_max,$end_month);?>
+                            <?php for ($i=1; $i <= 12; $i++) : ?>
+                                <option value="<?php echo $i ?>"<?php if($i == $end_month) echo 'selected' ?>><?php echo $i ?></option>
+                            <?php endfor ?>
                         </select>月
                         <select name="end_day" class="submit_time" value="<?php echo $end_day;?>">
-                            <?php optionLoop($day_min,$day_max,$end_day);?>
+                            <?php for ($i=1; $i <= 31; $i++) : ?>
+                                <option value="<?php echo $i ?>"<?php if($i == $end_day) echo 'selected' ?>><?php echo $i ?></option>
+                            <?php endfor ?>
                         </select>日
                         <select name="end_hour" class="submit_time">
-                            <?php for ($i=1; $i<24; $i++):?>
+                            <?php for ($i=1; $i<=24; $i++):?>
                             <option name="end_hour" value="<?php echo $i;?>"<?php if ($i == $end_hour):?>selected<?php endif;?>><?php echo $i ?></option>
                             <?php endfor; ?>
                         </select>時
@@ -195,33 +198,32 @@ if (!isset($_SESSION['post'])) {
                     <td>タイトル</td>
                 </tr>
                 <tr>
-                    <td><?php if(isset($_SESSION['error']['title_error'])) echo $_SESSION['error']['title_error']; ?><br /><input type="text" class="submit_text" name="schedule_title" value="<?php echo h($schedule_title);?>" /></td>
+                    <td><input type="text" class="submit_text" id="schedule-text" name="schedule_title" value="<?php echo h($schedule_title);?>" /></td>
                 </tr>
                 <tr>
                     <td>スケジュール内容</td>
                 </tr>
                 <tr>
-                    <td><?php if(isset($_SESSION['error']['contents_error'])) echo $_SESSION['error']['contents_error']; ?><br />
+                    <td>
                         <textarea class="submit_text" name="schedule_contents" rows="7" cols="60"><?php echo h($schedule_contents);?></textarea>
-                        <input type="hidden" name="schedule_id" value="<?php echo $schedule_id;?>" />
+                        <input id="schedule_num" type="hidden" name="id" value="<?php echo $schedule_id;?>" />
+                    </td>
+                </tr>
+                <tr>
+                    <td id="error_msg" class="error">
                     </td>
                 </tr>
                 <tr>
                     <td>
                         <?php if(!empty($schedule_id)):?>
-                            <input class="submit_btn regist_update" type="submit" value="更新" />
-                            <button class="submit_btn delete" type="submit" name="delete" value="delete">削除</button>
+                            <input id="update" class="submit_btn regist_update" type="submit" value="更新" />
+                            <button id="delete" class="submit_btn delete" type="submit" name="delete" value="delete">削除</button>
                         <?php else:?>
-                            <input class="submit_btn regist_update" type="submit" value="登録" />
+                            <input id="regist" class="submit_btn regist_update" type="submit" value="登録" />
                         <?php endif;?>
                     </td>  
                 </tr>
                 </form>
-                <tr>
-                    <td>
-                        <a href="index.php" class="submit_btn">&lt;&nbsp;戻る</a>
-                    </td>
-                </tr>
             </tbody>
         </table>
     </div>

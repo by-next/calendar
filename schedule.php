@@ -125,7 +125,7 @@ if (!isset($_SESSION['post'])) {
 <body>
     <div class="wrapper">
         <table class="schedule_table">
-            <caption>スケジュール編集</caption>
+            <caption><h3>スケジュール編集</h3></caption>
             <thead>
                 <tr>
                     <th>編集項目</th>

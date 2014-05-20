@@ -1,17 +1,35 @@
 @charset "UTF-8";
 /*css*/
-*{
-    margin: 0px;
-    padding: 0px;
-}
 html,body{
     font-family:'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック','MS PGothic',sans-serif;
     font-size: 12px;
     line-height: 1.6;
-    letter-spacing: 0;
     background-color: rgba(0,0,0,0.02);
+    margin: 0px;
+    padding: 0px;
     width: 100%;
     height: 100%;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+}
+body>*{
+    -webkit-flex:1;
+    -moz-flex:1;
+    -ms-flex:1;
+    -o-flex:1;
+    flex:1;
+}
+textarea{
+    resize: none;
+    overflow: scroll;
 }
 a{
     font-size: 13px;
@@ -62,11 +80,19 @@ a.topic:hover span{
     background-color: rgba(0,255,0,0.05);
 }
 /*ヘッダ*/
-#header{
-    width: 100%;
-    margin: 0 auto;
+header, footer {
+    max-height: 50px;
+    background-color:rgba(255,125,255,0.5);
     text-align: center;
-    color : rgba(100,200,0,0.7);
+    font-weight: bold;
+    line-height: 4;
+}
+header{
+    display: block;
+}
+
+header span{
+    display: block;
 }
 .header_link{
     width: 100%;
@@ -80,6 +106,12 @@ a.topic:hover span{
     margin: 0 auto;
     display: table;
     width: 100%;
+}
+@media (max-width: 900px) {
+    .main_box div:first-child,
+    .main_box div:last-child {
+        display: none;
+    }
 }
 .view_row{
     display: table-cell;
@@ -104,7 +136,7 @@ table.cal {
     border-color: rgba(0,0,0,0.1);
     border-collapse: collapse;
     text-align: center;
-    display: felx;
+    margin: 0 auto;
 }
 table.cal th {
     white-space: nowrap;
@@ -297,8 +329,3 @@ table.schedule_table th {
     cursor: pointer;
     background-color: rgba(255,255,255,1);
 }
-/*
-#res p{
-    margin: 4px 0;
-}
-*/

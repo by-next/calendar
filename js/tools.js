@@ -135,10 +135,10 @@ $(document).on('click','#regist',function(e){
     //開始と終了時間を変数へ代入
     var start_time = new Date(start_time_year,start_time_month-1,start_time_day,start_time_hour,start_time_min,00,000);
     var end_time   = new Date(end_time_year,end_time_month-1,end_time_day,end_time_hour,end_time_min,00,000);
-    var is_error = false;
-
-    $('.error').empty();
+    
     //バリデーション処理
+    var is_error = false;
+    $('.error').empty();
     if(start_time.getTime() > end_time.getTime()){
         $('.error').append('*時間がさかのぼっています。選択しなおしてください。<br />');
         is_error = true;
@@ -261,10 +261,11 @@ $(document).on('click','#update',function(e){
     //開始と終了時間を変数へ代入
     var start_time = new Date(start_time_year,start_time_month-1,start_time_day,start_time_hour,start_time_min,00,000);
     var end_time   = new Date(end_time_year,end_time_month-1,end_time_day,end_time_hour,end_time_min,00,000);
-    var is_error = false;
-
-    $('.error').empty();
+    
+    console.log(start_time);
     //バリデーション処理
+    var is_error = false;
+    $('.error').empty();
     if(start_time.getTime() > end_time.getTime()){
         $('.error').append('*時間がさかのぼっています。選択しなおしてください。<br />');
         is_error = true;

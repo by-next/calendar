@@ -137,10 +137,10 @@ $end_combo_year = $year+5;
 </header>
 <div class="cal_view">
     <div class="header_link">
-        <a href="<?php echo '?year='.$prev['year'].'&month='.$prev['month'] ?>" class="button medium move_month">先月</a>
-        <a href="index.php" class="button medium">今月</a>
-        <a href="<?php echo '?year='.$next['year'].'&month='.$next['month'] ?>" class="button medium move_month">次月</a>
-        <form method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
+        <a href="<?php echo '?year='.$prev['year'].'&month='.$prev['month'] ?>" class="button move_month">先月</a>
+        <a href="index.php" class="button">今月</a>
+        <a href="<?php echo '?year='.$next['year'].'&month='.$next['month'] ?>" class="button move_month">次月</a>
+        <form class="index-form" method="get" action="<?php $_SERVER['PHP_SELF']; ?>">
             <select class="submit_btn move_ym" name="year">
                 <?php for ($i=$start_combo_year; $i <= $end_combo_year; $i++) : ?>
                     <option value="<?php echo $i ?>"<?php if($i == $year) echo 'selected' ?>><?php echo $i ?></option>

@@ -55,7 +55,7 @@ if($msg != ''){
     echo $msg['title_error'].'<br />';
     echo $msg['contents_error'];
     return
-}
+};
 
 //DB接続
 $db_connect = db_connect();
